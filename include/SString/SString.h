@@ -1,9 +1,16 @@
+#pragma once
+#include <cstddef>
+
 namespace sstr {
 
-    class SString {
+    class SString final {
         /// 构造相关
     public:
-        static SString fromASCII(const char *);
+        explicit SString() noexcept;
+        SString(const SString &sString) noexcept;
+        SString(SString &&sString) noexcept;
+        ~SString() noexcept;
+
         static SString fromUTF8(const char *);
 //        static SString fromUTF16(const wchar_t *);
 //        static SString fromUTF32(const wchar_t *);
