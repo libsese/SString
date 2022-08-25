@@ -1,7 +1,33 @@
 #pragma once
 #include <cstddef>
+#include <cstdint>
+#include <vector>
+#include <string>
 
 namespace sstr {
+
+    struct SChar final {
+        uint32_t code = 0;
+
+        explicit SChar(uint32_t code) noexcept;
+
+        bool operator==(const SChar &ch) const;
+        bool operator<(const SChar &ch) const;
+
+        bool operator<=(const SChar &ch) const;
+        bool operator>(const SChar &ch) const;
+        bool operator>=(const SChar &ch) const;
+        bool operator!=(const SChar &ch) const;
+
+        SChar operator+(const SChar &ch) const;
+        SChar operator-(const SChar &ch) const;
+
+        explicit operator uint32_t () const;
+    };
+
+    extern SChar NullChar;
+
+    extern SChar getSCharFromUTF8Char(const char *u8char);
 
     class SString final {
         /// 构造相关
@@ -11,9 +37,9 @@ namespace sstr {
         SString(SString &&sString) noexcept;
         ~SString() noexcept;
 
-        static SString fromUTF8(const char *);
-//        static SString fromUTF16(const wchar_t *);
-//        static SString fromUTF32(const wchar_t *);
+        // static SString fromSChars(std::vector<SChar> &chars);
+        static SString fromUTF8(const char *str);
+        // static SString fromUCS2LE(const wchar_t *str);
 
         // 基础功能
     public:
@@ -37,6 +63,17 @@ namespace sstr {
         /// 获取缓冲区指针
         /// \return 缓冲区指针
         const char *data() const;
+
+        // 输出
+    public:
+        SChar at(size_t index) const;
+        std::vector<SChar> toChars() const;
+        std::string toString() const;
+        std::wstring toWString() const;
+
+        // 运算符
+    public:
+        SChar operator[](size_t index) const;
 
     private:
         char *_data = nullptr;
