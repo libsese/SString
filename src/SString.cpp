@@ -141,6 +141,7 @@ SChar SString::at(size_t index) const {
         }
         i += c;
     }
+    return NullChar;
 }
 
 std::vector<SChar> SString::toChars() const {
