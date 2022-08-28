@@ -163,6 +163,39 @@ SChar SString::operator[](size_t index) const {
     return at(index);
 }
 
+bool SString::operator==(const sstr::SString &str) const {
+    return 0 == strcmp(_data, str._data);
+}
+
+bool SString::operator==(const char *str) const {
+    return 0 == strcmp(_data, str);
+}
+
+SString SString::operator+(const SString &str) const {
+    SString res;
+    res._size = _size + str._size;
+    auto n = res._size / BLOCK_SIZE + 1;
+    res._capacity = n * BLOCK_SIZE;
+    res._data = (char *) malloc(n * res._capacity);
+    memcpy(res._data + 0, _data, _size);
+    memcpy(res._data + _size, str._data, str._size);
+    res._data[res._size] = '\0';
+    return res;
+}
+
+SString SString::operator+(const char *str) const {
+    SString res;
+    auto len = strlen(str);
+    res._size = _size + len;
+    auto n = res._size / BLOCK_SIZE + 1;
+    res._capacity = n * BLOCK_SIZE;
+    res._data = (char *) malloc(n * res._capacity);
+    memcpy(res._data + 0, _data, _size);
+    memcpy(res._data + _size, str, len);
+    res._data[res._size] = '\0';
+    return res;
+}
+
 SString SString::fromUTF8(const char *str) {
     SString sString;
     sString._size = getStringLengthFromUTF8(str);
@@ -170,6 +203,7 @@ SString SString::fromUTF8(const char *str) {
     sString._capacity = n * BLOCK_SIZE;
     sString._data = (char *) malloc(n * sString._capacity);
     memcpy(sString._data, str, sString._size);
+    sString._data[sString._size] = '\0';
     return sString;
 }
 

@@ -30,6 +30,22 @@ int main() {
         printf("\\u%04X", ch.code);
     }
     puts("");
+    puts("");
+
+    auto string1 = SString::fromUTF8(str);
+    printf("string1.data = %s\n", string1.data());
+    printf("string == string1 = %s\n", string == string1 ? "true" : "false");
+    printf("string == str = %s\n", string == str ? "true" : "false");
+    printf("string == str1 = %s\n", string == str1 ? "true" : "false");
+    puts("");
+
+    SString front = SString::fromUTF8("你好");
+    SString back = SString::fromUTF8("Hello");
+    const char *extra = "こんにちは";
+    SString res0 = front + back;
+    printf("front + back = %s\n", res0.data());
+    SString res1 = res0 + extra;
+    printf("front + back + extra = %s\n", res1.data());
 
     return 0;
 }
