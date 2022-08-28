@@ -163,6 +163,14 @@ SChar SString::operator[](size_t index) const {
     return at(index);
 }
 
+bool SString::operator!=(const char *str) const {
+    return 0 != strcmp(_data, str);
+}
+
+bool SString::operator!=(const sstr::SString &str) const {
+    return 0 != strcmp(_data, str._data);
+}
+
 bool SString::operator==(const sstr::SString &str) const {
     return 0 == strcmp(_data, str._data);
 }
@@ -176,7 +184,7 @@ SString SString::operator+(const SString &str) const {
     res._size = _size + str._size;
     auto n = res._size / BLOCK_SIZE + 1;
     res._capacity = n * BLOCK_SIZE;
-    res._data = (char *) malloc(n * res._capacity);
+    res._data = (char *) malloc(res._capacity);
     memcpy(res._data + 0, _data, _size);
     memcpy(res._data + _size, str._data, str._size);
     res._data[res._size] = '\0';
@@ -189,11 +197,42 @@ SString SString::operator+(const char *str) const {
     res._size = _size + len;
     auto n = res._size / BLOCK_SIZE + 1;
     res._capacity = n * BLOCK_SIZE;
-    res._data = (char *) malloc(n * res._capacity);
+    res._data = (char *) malloc(res._capacity);
     memcpy(res._data + 0, _data, _size);
     memcpy(res._data + _size, str, len);
     res._data[res._size] = '\0';
     return res;
+}
+
+void SString::operator+=(const char *str) {
+    auto len = strlen(str);
+    auto newSize = _size + len;
+    auto n = newSize / BLOCK_SIZE + 1;
+    _capacity = n * BLOCK_SIZE;
+
+    auto newData = (char *)malloc(_capacity);
+    memcpy(newData + 0, _data, _size);
+    memcpy(newData + _size, str, len);
+    newData[newSize] = '\0';
+    free(_data);
+
+    _data = newData;
+    _size = newSize;
+}
+
+void SString::operator+=(const sstr::SString &str) {
+    auto newSize = _size + str._size;
+    auto n = newSize / BLOCK_SIZE + 1;
+    _capacity = n * BLOCK_SIZE;
+
+    auto newData = (char *)malloc(_capacity);
+    memcpy(newData + 0, _data, _size);
+    memcpy(newData + _size, str._data, str._size);
+    newData[newSize] = '\0';
+    free(_data);
+
+    _data = newData;
+    _size = newSize;
 }
 
 SString SString::fromUTF8(const char *str) {

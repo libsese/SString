@@ -74,6 +74,12 @@ namespace sstr {
         // 运算符
     public:
         SChar operator[](size_t index) const;
+        bool operator!=(const SString &str) const;
+        /// 比较字符串是否不一致
+        /// \deprecated 比较对象的字符编码必须也是 UTF-8，否则不建议使用
+        /// \param str 待比较字符串
+        /// \return 是否不一致
+        bool operator!=(const char *str) const;
         bool operator==(const SString &str) const;
         /// 比较字符串是否一致
         /// \deprecated 比较对象的字符编码必须也是 UTF-8，否则不建议使用
@@ -86,6 +92,12 @@ namespace sstr {
         /// \param str 待尾加字符串
         /// \return 尾加结果字符串
         SString operator+(const char *str) const;
+        void operator+=(const SString &str);
+        ///
+        /// \deprecated 尾加对象的字符串编码必须也是 UTF-8，否则不建议使用
+        /// \param str 待尾加字符串
+        /// \return 尾加结果字符串
+        void operator+=(const char *str);
 
     private:
         char *_data = nullptr;
