@@ -1,3 +1,4 @@
+#include "SString/algorithm.h"
 #include <SString/SString.h>
 #include <cstring>
 
@@ -109,6 +110,28 @@ size_t SString::size() const {
     return _size;
 }
 
+int32_t SString::findByBytes(const char *bytes) const {
+    return BM(_data, bytes);
+}
+
+int32_t SString::find(const sstr::SString &str) const {
+    return find(str._data);
+}
+
+int32_t SString::find(const char *str) const {
+    auto index = BM(_data, str);
+    auto count = 0;
+
+    if (-1 == index) return -1;
+
+    for (auto i = 0; i < index;) {
+        auto n = getSizeFromUTF8Char(_data[i]);
+        i += n;
+        count++;
+    }
+    return count;
+}
+
 sstr::SString::SString() noexcept = default;
 
 SString::SString(const sstr::SString &sString) noexcept {
@@ -210,7 +233,7 @@ void SString::operator+=(const char *str) {
     auto n = newSize / BLOCK_SIZE + 1;
     _capacity = n * BLOCK_SIZE;
 
-    auto newData = (char *)malloc(_capacity);
+    auto newData = (char *) malloc(_capacity);
     memcpy(newData + 0, _data, _size);
     memcpy(newData + _size, str, len);
     newData[newSize] = '\0';
@@ -225,7 +248,7 @@ void SString::operator+=(const sstr::SString &str) {
     auto n = newSize / BLOCK_SIZE + 1;
     _capacity = n * BLOCK_SIZE;
 
-    auto newData = (char *)malloc(_capacity);
+    auto newData = (char *) malloc(_capacity);
     memcpy(newData + 0, _data, _size);
     memcpy(newData + _size, str._data, str._size);
     newData[newSize] = '\0';

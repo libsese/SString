@@ -46,6 +46,10 @@ int main() {
     printf("front + back = %s\n", res0.data());
     res0 += extra;
     printf("front + back + extra = %s\n", res0.data());
+    puts("");
+
+    printf("find by bytes: %d\n", string.findByBytes("こん"));
+    printf("find by utf-8 char: %d\n", string.find("にちは"));
 
     return 0;
 }

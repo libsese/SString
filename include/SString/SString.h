@@ -63,6 +63,19 @@ namespace sstr {
         /// 获取缓冲区指针
         /// \return 缓冲区指针
         const char *data() const;
+        /// 查找字符串，索引单位是字数
+        /// \param str 子串
+        /// \return 子串位置
+        int32_t find(const SString &str) const;
+        /// 查找字符串，索引单位是字数
+        /// \deprecated 查找子串的字符编码必须也是 UTF-8，否则不建议使用
+        /// \param str 子串
+        /// \return 子串位置
+        int32_t find(const char *str) const;
+        /// 查找字节串，索引单位是字节
+        /// \param bytes 子串
+        /// \return 子串位置
+        int32_t findByBytes(const char *bytes) const;
 
         // 输出
     public:
