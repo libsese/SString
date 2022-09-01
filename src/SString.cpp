@@ -132,6 +132,48 @@ int32_t SString::find(const char *str) const {
     return count;
 }
 
+SString SString::trim() const {
+    auto newSize = _size;
+    for(auto i = 0; i < _size; i++) {
+        if(_data[i] == ' ') {
+            newSize--;
+        }
+    }
+
+    auto newCap = (newSize / BLOCK_SIZE + 1) * BLOCK_SIZE;
+
+    char *newData = (char *) malloc(newCap);
+    char *p = _data;
+    while(*p == ' ') p++;
+    memcpy(newData, p, newSize);
+    newData[newSize] = '\0';
+
+    SString string;
+    string._size = newSize;
+    string._capacity = newCap;
+    string._data = newData;
+    return string;
+}
+
+SString SString::reverse() const {
+    SString string;
+    string._size = _size;
+    string._capacity = _capacity;
+    string._data = (char *) malloc(_capacity);
+
+    auto index = _size;
+    string._data[index] = '\0';
+
+    for(auto i = 0; i < _size; ) {
+        auto n = getSizeFromUTF8Char(_data[i]);
+        index -= n;
+        memcpy(string._data + index, _data + i, n);
+        i += n;
+    }
+
+    return string;
+}
+
 sstr::SString::SString() noexcept = default;
 
 SString::SString(const sstr::SString &sString) noexcept {

@@ -76,6 +76,13 @@ namespace sstr {
         /// \param bytes 子串
         /// \return 子串位置
         int32_t findByBytes(const char *bytes) const;
+        /// 除去字符串两端空格
+        /// \note 注意是空格
+        /// \return 处理后对象
+        SString trim() const;
+        /// 反转字符串
+        /// \return 反转后对象
+        SString reverse() const;
 
         // 输出
     public:

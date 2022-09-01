@@ -50,6 +50,12 @@ int main() {
 
     printf("find by bytes: %d\n", string.findByBytes("こん"));
     printf("find by utf-8 char: %d\n", string.find("にちは"));
+    puts("");
+
+    SString spaceString = SString::fromUTF8("  こんにちは  ");
+    SString trimString = spaceString.trim();
+    printf("after trim: %s\n", trimString.data());
+    printf("after reverse: %s\n", trimString.reverse().data());
 
     return 0;
 }
