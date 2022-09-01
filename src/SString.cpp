@@ -67,7 +67,7 @@ SChar sstr::NullChar = SChar(0);
 
 sstr::SString::~SString() noexcept {
     if (_data) {
-        delete _data;
+        free(_data);
     }
 }
 
