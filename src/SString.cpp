@@ -174,6 +174,31 @@ SString SString::reverse() const {
     return string;
 }
 
+SString SString::append(const char *str) const {
+    SString res;
+    auto len = strlen(str);
+    res._size = _size + len;
+    auto n = res._size / BLOCK_SIZE + 1;
+    res._capacity = n * BLOCK_SIZE;
+    res._data = (char *) malloc(res._capacity);
+    memcpy(res._data + 0, _data, _size);
+    memcpy(res._data + _size, str, len);
+    res._data[res._size] = '\0';
+    return res;
+}
+
+SString SString::append(const sstr::SString &str) const {
+    SString res;
+    res._size = _size + str._size;
+    auto n = res._size / BLOCK_SIZE + 1;
+    res._capacity = n * BLOCK_SIZE;
+    res._data = (char *) malloc(res._capacity);
+    memcpy(res._data + 0, _data, _size);
+    memcpy(res._data + _size, str._data, str._size);
+    res._data[res._size] = '\0';
+    return res;
+}
+
 sstr::SString::SString() noexcept = default;
 
 SString::SString(const sstr::SString &sString) noexcept {
@@ -245,28 +270,11 @@ bool SString::operator==(const char *str) const {
 }
 
 SString SString::operator+(const SString &str) const {
-    SString res;
-    res._size = _size + str._size;
-    auto n = res._size / BLOCK_SIZE + 1;
-    res._capacity = n * BLOCK_SIZE;
-    res._data = (char *) malloc(res._capacity);
-    memcpy(res._data + 0, _data, _size);
-    memcpy(res._data + _size, str._data, str._size);
-    res._data[res._size] = '\0';
-    return res;
+    return append(str);
 }
 
 SString SString::operator+(const char *str) const {
-    SString res;
-    auto len = strlen(str);
-    res._size = _size + len;
-    auto n = res._size / BLOCK_SIZE + 1;
-    res._capacity = n * BLOCK_SIZE;
-    res._data = (char *) malloc(res._capacity);
-    memcpy(res._data + 0, _data, _size);
-    memcpy(res._data + _size, str, len);
-    res._data[res._size] = '\0';
-    return res;
+    return append(str);
 }
 
 void SString::operator+=(const char *str) {

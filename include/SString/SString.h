@@ -83,6 +83,15 @@ namespace sstr {
         /// 反转字符串
         /// \return 反转后对象
         SString reverse() const;
+        /// 尾加字符串
+        /// \param str 待尾加字符串
+        /// \return 尾加结果字符串
+        SString append(const SString &str) const;
+        /// 尾加字符串
+        /// \deprecated 尾加对象的字符串编码必须也是 UTF-8，否则不建议使用
+        /// \param str 待尾加字符串
+        /// \return 尾加结果字符串
+        SString append(const char *str) const;
 
         // 输出
     public:
