@@ -38,9 +38,9 @@ namespace sstr {
         SString(SString &&sString) noexcept;
         ~SString() noexcept;
 
-        // static SString fromSChars(std::vector<SChar> &chars);
+        static SString fromSChars(std::vector<SChar> &chars);
         static SString fromUTF8(const char *str);
-        // static SString fromUCS2LE(const wchar_t *str);
+        static SString fromUCS2LE(const wchar_t *str);
 
         // 基础功能
     public:

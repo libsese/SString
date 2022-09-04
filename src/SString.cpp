@@ -1,6 +1,9 @@
-#include "SString/algorithm.h"
+#include <SString/algorithm.h>
 #include <SString/SString.h>
 #include <cstring>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 #define BLOCK_SIZE 16
 
@@ -30,6 +33,24 @@ char getSizeFromUTF8Char(char ch) {
     }
 }
 
+char getSizeFromUnicodeChar(SChar ch) {
+    if ((uint32_t) ch <= 0x7f) {
+        return 1;
+    } else if ((uint32_t) ch > 0x7f && (uint32_t) ch <= 0x7ff) {
+        return 2;
+    } else if ((uint32_t) ch > 0x7ff && (uint32_t) ch <= 0xffff) {
+        return 3;
+    } else if ((uint32_t) ch > 0xffff && (uint32_t) ch <= 0x7ffff) {
+        return 4;
+    } else {
+        return -1;
+    }
+}
+
+inline char getSizeFromWChat(wchar_t ch) {
+    return getSizeFromUnicodeChar((SChar) ch);
+}
+
 SChar getCodeFromUTF8(char size, const char *ch) {
     switch (size) {
         case 1:
@@ -43,6 +64,27 @@ SChar getCodeFromUTF8(char size, const char *ch) {
         default:
             return NullChar;
     }
+}
+
+bool insertUnicodeChar2UTF8String(char *destination, uint32_t code, size_t n) {
+    if (1 == n) {
+        *(destination + 0) = (char) (0b01111111 & code);
+    } else if (2 == n) {
+        *(destination + 0) = (char) (0b11000000 | (0b0000011111000000 & code) >> 6);
+        *(destination + 1) = (char) (0b10000000 | (0b0000000000111111 & code));
+    } else if (3 == n) {
+        *(destination + 0) = (char) (0b11100000 | (0b1111000000000000 & code) >> 12);
+        *(destination + 1) = (char) (0b10000000 | (0b0000111111000000 & code) >> 6);
+        *(destination + 2) = (char) (0b10000000 | (0b0000000000111111 & code));
+    } else if (4 == n) {
+        *(destination + 0) = (char) (0b11110000 | (0b000111000000000000000000 & code) >> 18);
+        *(destination + 1) = (char) (0b10000000 | (0b000000111111000000000000 & code) >> 12);
+        *(destination + 2) = (char) (0b10000000 | (0b000000000000111111000000 & code) >> 6);
+        *(destination + 3) = (char) (0b10000000 | (0b000000000000000000111111 & code));
+    } else {
+        return false;
+    }
+    return true;
 }
 
 SChar sstr::getSCharFromUTF8Char(const char *u8char) {
@@ -353,13 +395,55 @@ SString SString::fromUTF8(const char *str) {
     return sString;
 }
 
-//SString SString::fromUCS2LE(const wchar_t *str) {
-//    SString sString;
-//#ifdef _WIN32
-//    // on dos-like, wchar_t use 2 bytes
-//    // as utf-16le
-//#else
-//    // on *nix, wchar_t use 4 bytes by defalut
-//    // as utf-32le
-//#endif
-//}
+SString SString::fromSChars(std::vector<SChar> &chars) {
+    SString string;
+    for (auto i: chars) {
+        // 暂时不处理损坏的字符
+        string._size += getSizeFromUnicodeChar(i);
+    }
+    string._capacity = (string._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    string._data = (char *) malloc(string._capacity);
+
+    auto index = 0;
+    for (auto i: chars) {
+        auto n = getSizeFromUnicodeChar(i);
+        insertUnicodeChar2UTF8String(string._data + index, (uint32_t) i, n);
+        index += n;
+    }
+
+    string._data[string._size] = '\0';
+    return string;
+}
+
+SString SString::fromUCS2LE(const wchar_t *str) {
+    // on dos-like, wchar_t use 2 bytes
+    // as utf-16le
+    // on *nix, wchar_t use 4 bytes by default
+    // as utf-32le
+    SString sString;
+    const wchar_t *p = str;
+    while (L'\0' != *p) {
+        sString._size += getSizeFromWChat(*p);
+        p++;
+    }
+    sString._capacity = (sString._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    sString._data = (char *) malloc(sString._capacity);
+    // 无法转换部分字符串
+    // wcstombs(sString._data, str, sString._size);
+
+#ifdef _WIN32
+    WideCharToMultiByte(CP_UTF8, 0, str, -1, sString._data, sString._size, NULL, NULL);
+#else
+    p = str;
+    auto index = 0;
+    while (L'\0' != *p) {
+        auto n = getSizeFromUnicodeChar((SChar) *p);
+        insertUnicodeChar2UTF8String(sString._data + index, (uint32_t) *p, n);
+        index += n;
+        p++;
+    }
+#endif
+
+    sString._data[sString._size] = '\0';
+    return sString;
+}

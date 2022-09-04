@@ -64,6 +64,12 @@ int main() {
     for (const auto &i: spiltRes) {
         printf("%s\n", i.data());
     }
+    puts("");
+
+    printf("SString from SChars: %s\n", SString::fromSChars(chars).data());
+
+    SString wstring = SString::fromUCS2LE(L"你好 こんにちは Hello");
+    printf("Is SString from wchar* equal raw string: %s\n", wstring == string ? "true" : "false");
 
     return 0;
 }
