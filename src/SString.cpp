@@ -134,8 +134,8 @@ int32_t SString::find(const char *str) const {
 
 SString SString::trim() const {
     auto newSize = _size;
-    for(auto i = 0; i < _size; i++) {
-        if(_data[i] == ' ') {
+    for (auto i = 0; i < _size; i++) {
+        if (_data[i] == ' ') {
             newSize--;
         }
     }
@@ -144,7 +144,7 @@ SString SString::trim() const {
 
     char *newData = (char *) malloc(newCap);
     char *p = _data;
-    while(*p == ' ') p++;
+    while (*p == ' ') p++;
     memcpy(newData, p, newSize);
     newData[newSize] = '\0';
 
@@ -164,7 +164,7 @@ SString SString::reverse() const {
     auto index = _size;
     string._data[index] = '\0';
 
-    for(auto i = 0; i < _size; ) {
+    for (auto i = 0; i < _size;) {
         auto n = getSizeFromUTF8Char(_data[i]);
         index -= n;
         memcpy(string._data + index, _data + i, n);
@@ -200,6 +200,14 @@ SString SString::append(const sstr::SString &str) const {
 }
 
 sstr::SString::SString() noexcept = default;
+
+SString::SString(const char *str, size_t size) {
+    _size = size;
+    _capacity = (size / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    _data = (char *) malloc(_capacity);
+    memcpy(_data, str, size);
+    _data[size] = '\0';
+}
 
 SString::SString(const sstr::SString &sString) noexcept {
     _data = sString._data;
@@ -247,6 +255,32 @@ std::vector<SChar> SString::toChars() const {
         i += n;
     }
     return chars;
+}
+
+std::vector<SString> SString::split(const char *str) const {
+    std::vector<SString> v;
+    auto size = getStringLengthFromUTF8(str);
+
+    std::string::size_type pos1, pos2;
+    pos2 = BM(_data, str);
+    pos1 = 0;
+    while (true) {
+        v.emplace_back(SString(_data + pos1, pos2 - pos1));
+
+        pos1 = pos2 + size;
+        pos2 = BM(_data + pos1, str);
+        if (-1 == pos2) {
+            v.emplace_back(SString::fromUTF8(_data + pos1));
+            break;
+        } else {
+            pos2 += pos1;
+        }
+    }
+    return v;
+}
+
+std::vector<SString> SString::split(const SString &str) const {
+    return split(str._data);
 }
 
 SChar SString::operator[](size_t index) const {

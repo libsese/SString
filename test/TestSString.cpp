@@ -56,6 +56,14 @@ int main() {
     SString trimString = spaceString.trim();
     printf("after trim: %s\n", trimString.data());
     printf("after reverse: %s\n", trimString.reverse().data());
+    puts("");
+
+    auto spiltString = SString::fromUTF8("こんにちは、わたくしはSStringです");
+    printf("spilt string: %s\n", spiltString.data());
+    auto spiltRes = spiltString.split("は");
+    for (const auto &i: spiltRes) {
+        printf("%s\n", i.data());
+    }
 
     return 0;
 }
