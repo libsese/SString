@@ -132,7 +132,7 @@ namespace sstr {
         /// \return 尾加结果字符串
         SString operator+(const char *str) const;
         void operator+=(const SString &str);
-        ///
+        /// 尾加字符串
         /// \deprecated 尾加对象的字符串编码必须也是 UTF-8，否则不建议使用
         /// \param str 待尾加字符串
         /// \return 尾加结果字符串
