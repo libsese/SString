@@ -107,8 +107,8 @@ namespace sstr {
     public:
         SChar at(size_t index) const;
         std::vector<SChar> toChars() const;
-        // std::string toString() const;
-        // std::wstring toWString() const;
+        std::string toString() const;
+        std::wstring toWString() const;
 
         // 运算符
     public:

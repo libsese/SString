@@ -1,5 +1,5 @@
-#include <SString/algorithm.h>
 #include <SString/SString.h>
+#include <SString/algorithm.h>
 #include <cstring>
 #ifdef _WIN32
 #include <Windows.h>
@@ -11,7 +11,7 @@ using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
 
-size_t getStringLengthFromUTF8(const char *str) {
+size_t getByteLengthFromUTF8(const char *str) {
     size_t len = 0;
     while (*(str + len)) {
         len++;
@@ -285,7 +285,7 @@ SChar SString::at(size_t index) const {
 }
 
 std::vector<SChar> SString::toChars() const {
-    auto len = getStringLengthFromUTF8(_data);
+    auto len = getByteLengthFromUTF8(_data);
     std::vector<SChar> chars;
     chars.reserve(len);
     for (size_t i = 0; i < _size;) {
@@ -301,7 +301,7 @@ std::vector<SChar> SString::toChars() const {
 
 std::vector<SString> SString::split(const char *str) const {
     std::vector<SString> v;
-    auto size = getStringLengthFromUTF8(str);
+    auto size = getByteLengthFromUTF8(str);
 
     std::string::size_type pos1, pos2;
     pos2 = BM(_data, str);
@@ -323,6 +323,35 @@ std::vector<SString> SString::split(const char *str) const {
 
 std::vector<SString> SString::split(const SString &str) const {
     return split(str._data);
+}
+
+std::string SString::toString() const {
+    return {_data};
+}
+
+std::wstring SString::toWString() const {
+#ifdef _WIN32
+    size_t size = MultiByteToWideChar(CP_UTF8, 0, _data, -1, NULL, 0);
+    auto *str = (wchar_t *) malloc(size * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, _data, -1, str, size);
+    std::wstring wstring(str);
+    free(str);
+    return wstring;
+#else
+    size_t size = len();
+    auto *str = (wchar_t *) malloc((size + 1) * sizeof(wchar_t));
+    auto count = 0;
+    for (auto i = 0; i < _size;) {
+        auto n = getSizeFromUTF8Char(_data[i]);
+        str[count] = (wchar_t) (uint32_t) getCodeFromUTF8(n, _data + i);
+        i += n;
+        count++;
+    }
+    str[size] = L'\0';
+    std::wstring wstring(str);
+    free(str);
+    return wstring;
+#endif
 }
 
 SChar SString::operator[](size_t index) const {
@@ -386,7 +415,7 @@ void SString::operator+=(const sstr::SString &str) {
 
 SString SString::fromUTF8(const char *str) {
     SString sString;
-    sString._size = getStringLengthFromUTF8(str);
+    sString._size = getByteLengthFromUTF8(str);
     auto n = sString._size / BLOCK_SIZE + 1;
     sString._capacity = n * BLOCK_SIZE;
     sString._data = (char *) malloc(n * sString._capacity);

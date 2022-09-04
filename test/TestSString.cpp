@@ -1,5 +1,6 @@
 #include <SString/SString.h>
 #include <cstdio>
+#include <iostream>
 
 using sstr::SChar;
 using sstr::SString;
@@ -70,6 +71,10 @@ int main() {
 
     SString wstring = SString::fromUCS2LE(L"你好 こんにちは Hello");
     printf("Is SString from wchar* equal raw string: %s\n", wstring == string ? "true" : "false");
+
+
+    std::cout << "toString: " << wstring.toString() << std::endl;
+    // std::wcout << L"toWString: " << wstring.toWString() << std::endl;
 
     return 0;
 }
