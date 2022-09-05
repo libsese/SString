@@ -16,7 +16,7 @@ int main() {
     puts("");
 
     const char *s1 = "你こH";
-    SChar ch0 = sstr::getSCharFromUTF8Char(s1);
+    SChar ch0 = sstr::getUnicodeFromUTF8Char(s1);
     printf("ch0 = %u\n", (uint32_t) ch0);
 
     auto str1 = SString::fromUTF8(s1);

@@ -11,7 +11,10 @@ using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
 
-size_t getByteLengthFromUTF8(const char *str) {
+/// 获取 UTF-8 字符串字节长度
+/// \param str
+/// \return
+static size_t getByteLengthFromUTF8String(const char *str) {
     size_t len = 0;
     while (*(str + len)) {
         len++;
@@ -19,7 +22,10 @@ size_t getByteLengthFromUTF8(const char *str) {
     return len;
 }
 
-char getSizeFromUTF8Char(char ch) {
+/// 获取 UTF-8 字符串占位字节数
+/// \param ch
+/// \return
+static char getSizeFromUTF8Char(char ch) {
     if ((ch & 0b10000000) == 0b00000000) {
         return 1;
     } else if ((ch & 0b11100000) == 0b11000000) {
@@ -33,7 +39,10 @@ char getSizeFromUTF8Char(char ch) {
     }
 }
 
-char getSizeFromUnicodeChar(SChar ch) {
+/// 从 SChar 中获取该字符在 UTF-8 中的字节占位字节数
+/// \param ch Unicode 字符
+/// \return 占位字节数
+static char getUTF8SizeFromUnicodeChar(SChar ch) {
     if ((uint32_t) ch <= 0x7f) {
         return 1;
     } else if ((uint32_t) ch > 0x7f && (uint32_t) ch <= 0x7ff) {
@@ -47,11 +56,19 @@ char getSizeFromUnicodeChar(SChar ch) {
     }
 }
 
-inline char getSizeFromWChat(wchar_t ch) {
-    return getSizeFromUnicodeChar((SChar) ch);
+/// 从 wchar_t 中获取该字符在 UTF-8 中的字节占位字节数
+/// \warning 该函数仅在 *nix 上可用
+/// \param ch 宽字节
+/// \return 占位字节数
+inline char getUTF8SizeFromWChat(wchar_t ch) {
+    return getUTF8SizeFromUnicodeChar((SChar) ch);
 }
 
-SChar getCodeFromUTF8(char size, const char *ch) {
+/// 从 UTF-8 字符串中获取 Unicode 字符
+/// \param size 该 UTF-8 占位字节数
+/// \param ch UTF-8 字符起始位置
+/// \return Unicode 字符
+static SChar getUnicodeCharFromUTF8Char(char size, const char *ch) {
     switch (size) {
         case 1:
             return SChar(*ch & 0b01111111);
@@ -66,7 +83,12 @@ SChar getCodeFromUTF8(char size, const char *ch) {
     }
 }
 
-bool insertUnicodeChar2UTF8String(char *destination, uint32_t code, size_t n) {
+/// 向字节流中写入 UTF-8 编码的 Unicode 字符
+/// \param destination 写入位置
+/// \param code Unicode 字符
+/// \param n 该字符在 UTF-8 占位字节数
+/// \return 是否成功
+static bool insertUnicodeChar2UTF8String(char *destination, uint32_t code, size_t n) {
     if (1 == n) {
         *(destination + 0) = (char) (0b01111111 & code);
     } else if (2 == n) {
@@ -87,8 +109,8 @@ bool insertUnicodeChar2UTF8String(char *destination, uint32_t code, size_t n) {
     return true;
 }
 
-SChar sstr::getSCharFromUTF8Char(const char *u8char) {
-    return getCodeFromUTF8(getSizeFromUTF8Char(*u8char), u8char);
+SChar sstr::getUnicodeFromUTF8Char(const char *u8char) {
+    return getUnicodeCharFromUTF8Char(getSizeFromUTF8Char(*u8char), u8char);
 }
 
 SChar::SChar(uint32_t _code) noexcept { code = _code; }
@@ -277,7 +299,7 @@ SChar SString::at(size_t index) const {
         if (i + c > _size) return NullChar;
         n++;
         if (index == n) {
-            return getCodeFromUTF8(c, &_data[i]);
+            return getUnicodeCharFromUTF8Char(c, &_data[i]);
         }
         i += c;
     }
@@ -285,7 +307,7 @@ SChar SString::at(size_t index) const {
 }
 
 std::vector<SChar> SString::toChars() const {
-    auto len = getByteLengthFromUTF8(_data);
+    auto len = getByteLengthFromUTF8String(_data);
     std::vector<SChar> chars;
     chars.reserve(len);
     for (size_t i = 0; i < _size;) {
@@ -293,7 +315,7 @@ std::vector<SChar> SString::toChars() const {
         auto n = getSizeFromUTF8Char(_data[i]);
         if (-1 == n) break;
         if (i + n > _size) break;
-        chars.emplace_back(getCodeFromUTF8(n, &_data[i]));
+        chars.emplace_back(getUnicodeCharFromUTF8Char(n, &_data[i]));
         i += n;
     }
     return chars;
@@ -301,7 +323,7 @@ std::vector<SChar> SString::toChars() const {
 
 std::vector<SString> SString::split(const char *str) const {
     std::vector<SString> v;
-    auto size = getByteLengthFromUTF8(str);
+    auto size = getByteLengthFromUTF8String(str);
 
     std::string::size_type pos1, pos2;
     pos2 = BM(_data, str);
@@ -342,7 +364,7 @@ std::unique_ptr<wchar_t[]> SString::toCWString() const {
     auto count = 0;
     for (auto i = 0; i < _size;) {
         auto n = getSizeFromUTF8Char(_data[i]);
-        str[count] = (wchar_t) (uint32_t) getCodeFromUTF8(n, _data + i);
+        str[count] = (wchar_t) (uint32_t) getUnicodeCharFromUTF8Char(n, _data + i);
         i += n;
         count++;
     }
@@ -416,7 +438,7 @@ void SString::operator+=(const sstr::SString &str) {
 
 SString SString::fromUTF8(const char *str) {
     SString sString;
-    sString._size = getByteLengthFromUTF8(str);
+    sString._size = getByteLengthFromUTF8String(str);
     auto n = sString._size / BLOCK_SIZE + 1;
     sString._capacity = n * BLOCK_SIZE;
     sString._data = (char *) malloc(n * sString._capacity);
@@ -429,14 +451,14 @@ SString SString::fromSChars(std::vector<SChar> &chars) {
     SString string;
     for (auto i: chars) {
         // 暂时不处理损坏的字符
-        string._size += getSizeFromUnicodeChar(i);
+        string._size += getUTF8SizeFromUnicodeChar(i);
     }
     string._capacity = (string._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
     string._data = (char *) malloc(string._capacity);
 
     auto index = 0;
     for (auto i: chars) {
-        auto n = getSizeFromUnicodeChar(i);
+        auto n = getUTF8SizeFromUnicodeChar(i);
         insertUnicodeChar2UTF8String(string._data + index, (uint32_t) i, n);
         index += n;
     }
@@ -453,7 +475,7 @@ SString SString::fromUCS2LE(const wchar_t *str) {
     SString sString;
     const wchar_t *p = str;
     while (L'\0' != *p) {
-        sString._size += getSizeFromWChat(*p);
+        sString._size += getUTF8SizeFromWChat(*p);
         p++;
     }
     sString._capacity = (sString._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
@@ -467,7 +489,7 @@ SString SString::fromUCS2LE(const wchar_t *str) {
     p = str;
     auto index = 0;
     while (L'\0' != *p) {
-        auto n = getSizeFromUnicodeChar((SChar) *p);
+        auto n = getUTF8SizeFromUnicodeChar((SChar) *p);
         insertUnicodeChar2UTF8String(sString._data + index, (uint32_t) *p, n);
         index += n;
         p++;

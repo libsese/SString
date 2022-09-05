@@ -29,7 +29,7 @@ namespace sstr {
 
     extern SChar NullChar;
 
-    extern SChar getSCharFromUTF8Char(const char *u8char);
+    extern SChar getUnicodeFromUTF8Char(const char *u8char);
 
     class SString final {
         /// 构造相关
