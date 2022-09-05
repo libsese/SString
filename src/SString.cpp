@@ -10,6 +10,7 @@
 using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
+using sstr::SStringIterator;
 
 /// 获取 UTF-8 字符串字节长度
 /// \param str
@@ -128,6 +129,72 @@ SChar SChar::operator-(const sstr::SChar &ch) const { return SChar(code - ch.cod
 sstr::SChar::operator uint32_t() const { return code; }
 
 SChar sstr::NullChar = SChar(0);
+
+SStringIterator::SStringIterator(const char *ref, size_t size, size_t pos) {
+    _ref = ref;
+    _size = size;
+    _pos = pos;
+    _ch = getUnicodeFromUTF8Char(ref);
+}
+
+SStringIterator SStringIterator::operator++() {
+    if (NullChar == _ch) {
+        return *this;
+    }
+    auto n = getUTF8SizeFromUnicodeChar(_ch);
+    _pos += n;
+    _ch = getUnicodeFromUTF8Char(_ref + _pos);
+    return *this;
+} /**/
+
+SStringIterator SStringIterator::operator++(int c) {
+    auto count = 0;
+    while (_ch != NullChar || c == count) {
+        auto n = getUTF8SizeFromUnicodeChar(_ch);
+        _pos += n;
+        _ch = getUnicodeFromUTF8Char(_ref + _pos);
+    }
+    return *this;
+}
+
+bool SStringIterator::operator==(const SStringIterator &other) const {
+    return _ref + _pos == other._ref + other._pos;
+}
+
+bool SStringIterator::operator!=(const SStringIterator &other) const {
+    return _ref + _pos != other._ref + other._pos;
+}
+
+SChar SStringIterator::operator*() {
+    return _ch;
+}
+
+SStringIterator SStringIterator::begin() {
+    _pos = 0;
+    _ch = getUnicodeFromUTF8Char(_ref);
+    return *this;
+}
+
+SStringIterator SStringIterator::end() {
+    SStringIterator end;
+    end._ref = _ref;
+    end._pos = _size;
+    end._size = _size;
+    end._ch = getUnicodeFromUTF8Char(_ref + _size);
+    return end;
+}
+
+SString::IteratorType SString::iterator() {
+    return {_data, _size};
+}
+
+SString::IteratorType SString::begin() {
+    return {_data, _size};
+}
+
+SString::IteratorType SString::end() {
+    return {_data, _size, _size};
+}
 
 sstr::SString::~SString() noexcept {
     if (_data) {

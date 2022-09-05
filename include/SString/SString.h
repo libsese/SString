@@ -31,6 +31,33 @@ namespace sstr {
 
     extern SChar getUnicodeFromUTF8Char(const char *u8char);
 
+    class SStringIterator final : public std::iterator<std::forward_iterator_tag,
+                                                 SChar,
+                                                 SChar,
+                                                 const char *,
+                                                 const char &> {
+    public:
+        SStringIterator(const char *ref, size_t size, size_t pos = 0);
+
+        SStringIterator operator++();
+        SStringIterator operator++(int c);
+
+        bool operator==(const SStringIterator &other) const;
+        bool operator!=(const SStringIterator &other) const;
+        SChar operator*();
+
+        SStringIterator begin();
+        SStringIterator end();
+
+    private:
+        SStringIterator() = default;
+
+        const char *_ref = nullptr;
+        size_t _pos = 0;
+        size_t _size = 0;
+        SChar _ch = NullChar;
+    };
+
     class SString final {
         /// 构造相关
     public:
@@ -43,6 +70,13 @@ namespace sstr {
         static SString fromSChars(std::vector<SChar> &chars);
         static SString fromUTF8(const char *str);
         static SString fromUCS2LE(const wchar_t *str);
+
+        // 迭代器
+    public:
+        using IteratorType = SStringIterator;
+        IteratorType iterator();
+        IteratorType begin();
+        IteratorType end();
 
         // 基础功能
     public:

@@ -31,6 +31,11 @@ int main() {
         printf("\\u%04X", ch.code);
     }
     puts("");
+    puts("begin..end");
+    for (auto ch: string) {
+        printf("\\u%04X", ch.code);
+    }
+    puts("");
     puts("");
 
     auto string1 = SString::fromUTF8(str);
