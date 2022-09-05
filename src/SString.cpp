@@ -329,17 +329,16 @@ std::string SString::toString() const {
     return {_data};
 }
 
-std::wstring SString::toWString() const {
+std::unique_ptr<wchar_t[]> SString::toCWString() const {
 #ifdef _WIN32
     size_t size = MultiByteToWideChar(CP_UTF8, 0, _data, -1, NULL, 0);
-    auto *str = (wchar_t *) malloc(size * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, _data, -1, str, size);
-    std::wstring wstring(str);
-    free(str);
-    return wstring;
+    auto ptr = std::unique_ptr<wchar_t[]>(new wchar_t[size]);
+    MultiByteToWideChar(CP_UTF8, 0, _data, -1, ptr.get(), size);
+    return ptr;
 #else
     size_t size = len();
-    auto *str = (wchar_t *) malloc((size + 1) * sizeof(wchar_t));
+    auto str = new wchar_t[size + 1];
+    auto ptr = std::unique_ptr<wchar_t[]>(str);
     auto count = 0;
     for (auto i = 0; i < _size;) {
         auto n = getSizeFromUTF8Char(_data[i]);
@@ -348,10 +347,12 @@ std::wstring SString::toWString() const {
         count++;
     }
     str[size] = L'\0';
-    std::wstring wstring(str);
-    free(str);
-    return wstring;
+    return ptr;
 #endif
+}
+
+std::wstring SString::toWString() const {
+    return {toCWString().get()};
 }
 
 SChar SString::operator[](size_t index) const {
