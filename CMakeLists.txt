@@ -9,7 +9,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_compile_options("/utf-8")
 endif ()
 
-add_library(SString src/algorithm.cpp src/SString.cpp)
+add_library(SString src/algorithm.cpp src/SString.cpp src/SStringBuilder.cpp)
 
 enable_testing()
 add_executable(TestSString test/TestSString.cpp)
