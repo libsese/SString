@@ -21,6 +21,18 @@ size_t sstr::getByteLengthFromUTF8String(const char *str) {
     return len;
 }
 
+size_t sstr::getStringLengthFromUTF8String(const char *str) {
+    size_t len = 0;
+    size_t i = 0;
+    while (true) {
+        if (0 == str[i]) return len;
+        auto n = getSizeFromUTF8Char(str[i]);
+        if (-1 == n) return len;
+        i += n;
+        len++;
+    }
+}
+
 char sstr::getSizeFromUTF8Char(char ch) {
     if ((ch & 0b10000000) == 0b00000000) {
         return 1;

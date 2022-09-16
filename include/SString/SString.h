@@ -35,6 +35,11 @@ namespace sstr {
     /// \return 字符代码
     extern SChar getUnicodeFromUTF8Char(const char *u8char);
 
+    /// 获取 UTF-8 字符串长度
+    /// \param str 字符串
+    /// \return 字符串长度
+    extern "C" size_t getStringLengthFromUTF8String(const char *str);
+
     /// 获取 UTF-8 字符串字节长度
     /// \param str 目标字符串
     /// \return 字符串字节长度
