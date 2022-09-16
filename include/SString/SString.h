@@ -27,9 +27,34 @@ namespace sstr {
         explicit operator uint32_t() const;
     };
 
+    /// 空字符 '\0'
     extern SChar NullChar;
 
+    /// 获取 UTF-8 字符代码
+    /// \param u8char UTF-8 字符
+    /// \return 字符代码
     extern SChar getUnicodeFromUTF8Char(const char *u8char);
+
+    /// 获取 UTF-8 字符串字节长度
+    /// \param str 目标字符串
+    /// \return 字符串字节长度
+    extern "C" size_t getByteLengthFromUTF8String(const char *str);
+
+    /// 获取 UTF-8 字符占位字节数
+    /// \param ch 目标字符
+    /// \return 字符占位字节数
+    extern "C" char getSizeFromUTF8Char(char ch);
+
+    /// 从 SChar 中获取该字符在 UTF-8 中的字节占位字节数
+    /// \param ch Unicode 字符
+    /// \return 占位字节数
+    extern char getUTF8SizeFromUnicodeChar(SChar ch);
+
+    /// 从 UTF-8 字符串中获取 Unicode 字符
+    /// \param size 该 UTF-8 占位字节数
+    /// \param ch UTF-8 字符起始位置
+    /// \return Unicode 字符
+    extern SChar getUnicodeCharFromUTF8Char(char size, const char *ch);
 
     class SStringIterator final : public std::iterator<std::forward_iterator_tag,
                                                  SChar,
@@ -67,6 +92,7 @@ namespace sstr {
         SString(SString &&sString) noexcept;
         ~SString() noexcept;
 
+        static SString fromSChars(SChar ch[], size_t size);
         static SString fromSChars(std::vector<SChar> &chars);
         static SString fromUTF8(const char *str);
         static SString fromUCS2LE(const wchar_t *str);
