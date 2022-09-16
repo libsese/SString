@@ -1,4 +1,5 @@
 #include <SString/SStringBuilder.h>
+#include <cstring>
 
 #define BLOCK_SIZE 1024
 

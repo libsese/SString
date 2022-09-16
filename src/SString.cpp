@@ -199,6 +199,7 @@ SString::IteratorType SString::end() {
 sstr::SString::~SString() noexcept {
     if (_data) {
         free(_data);
+        _data = nullptr;
     }
 }
 
@@ -341,9 +342,10 @@ SString::SString(const char *str, size_t size) {
 }
 
 SString::SString(const sstr::SString &sString) noexcept {
-    _data = sString._data;
     _capacity = sString._capacity;
     _size = sString._size;
+    _data = (char *) malloc(_capacity);
+    memcpy(_data, sString._data, _size + 1);
 }
 
 SString::SString(sstr::SString &&sString) noexcept {
