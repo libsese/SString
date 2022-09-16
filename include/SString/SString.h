@@ -170,6 +170,10 @@ namespace sstr {
         /// \return 切割结果
         std::vector<SString> split(const char *str) const;
 
+        // todo 待实现功能
+        // SString substring(size_t begin) const;
+        // SString substring(size_t begin, size_t len) const;
+
         // 输出
     public:
         SChar at(size_t index) const;

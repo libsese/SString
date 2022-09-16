@@ -29,10 +29,24 @@ namespace sstr {
         int32_t find(const SString &str) const;
         void append(const char *str);
         void append(const SString &str);
+        
+        // 不会支持
         // std::vector<SString> split(const char *str) const;
         // std::vector<SString> split(const SString &str) const;
-        SChar at(size_t index) const;
+
         void clear();
+
+        SChar at(size_t index) const;
+        // todo 待实现功能
+        // void remove(size_t begin);
+        // void remove(size_t begin, size_t len);
+        // void substring(size_t begin);
+        // void substring(size_t begin, size_t len);
+        // void insert(size_t index, SChar ch);
+        // void insert(size_t index, const char *str);
+        // void insert(size_t index, const SString &str);
+        // void replace(size_t begin, size_t len, const char *str);
+        // void replace(size_t begin, size_t len, const SString &str);
     
         SString toString() const;
 
