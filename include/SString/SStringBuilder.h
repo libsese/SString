@@ -6,6 +6,8 @@ namespace sstr {
     class SStringBuilder final {
         // 构造相关
     public:
+        SStringBuilder(const SStringBuilder &builder);
+        SStringBuilder(SStringBuilder &&builder);
         SStringBuilder(size_t bufferSize);
         ~SStringBuilder();
 
@@ -21,15 +23,16 @@ namespace sstr {
         /// \param size 扩容大小，单位为 4 bytes
         /// \return 操作是否成功
         bool reserve(size_t size);
-        // void trim();
-        // void reverse();
-        // int32_t find(const char *str) const;
-        // int32_t find(const SString &str) const;
+        void trim();
+        void reverse();
+        int32_t find(const char *str) const;
+        int32_t find(const SString &str) const;
         void append(const char *str);
         void append(const SString &str);
         // std::vector<SString> split(const char *str) const;
         // std::vector<SString> split(const SString &str) const;
-        // SChar at(size_t index) const;
+        SChar at(size_t index) const;
+        void clear();
     
         SString toString() const;
 

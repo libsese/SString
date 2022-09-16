@@ -1,4 +1,5 @@
 #include <SString/SStringBuilder.h>
+#include <SString/algorithm.h>
 #include <cstring>
 
 #define BLOCK_SIZE 1024
@@ -7,6 +8,23 @@ using sstr::SChar;
 using sstr::SString;
 using sstr::SStringBuilder;
 using sstr::NullChar;
+
+SStringBuilder::SStringBuilder(const SStringBuilder &builder) {
+    _cap = builder._cap;
+    _size = builder._size;
+    _data = (uint32_t *) malloc(_cap * sizeof(uint32_t));
+    memcpy(_data, builder._data, (_size + 1) * sizeof(uint32_t));
+}
+
+SStringBuilder::SStringBuilder(SStringBuilder &&builder) {
+    _data = builder._data;
+    _size = builder._size;
+    _cap = builder._cap;
+
+    builder._data = nullptr;
+    builder._size = 0;
+    builder._cap = 0;
+}
 
 SStringBuilder::SStringBuilder(size_t bufferSize) {
     _data = (uint32_t *) malloc(bufferSize * sizeof(uint32_t));
@@ -92,6 +110,74 @@ bool SStringBuilder::reserve(size_t size) {
     }
 }
 
+void SStringBuilder::trim() {
+    size_t i = 0; // 头部空格数
+    bool flag0 = true;
+    size_t j = 0; // 尾部空格数
+    bool flag1 = true;
+    for(auto n = 0; n < _size; n++) {
+        if (flag0 && ' ' == _data[n]) {
+            i++;
+        } else {
+            flag0 = false;
+        }
+        
+        if (flag1 && ' ' == _data[_size - 1 - n]) {
+            j++;
+        } else {
+            flag1 = false;
+            break;
+        }
+    }
+
+    // 头尾空白相接
+    if (i + j == _size) {
+        _data[0] = 0;
+        return;
+    } 
+    // 正常处理
+    else {
+        size_t len = _size - j - i;
+        for(size_t n = 0; n < len; n++) {
+            _data[n] = _data[i + n];
+        }
+        _data[len] = 0;
+    }
+}
+
+void SStringBuilder::reverse() {
+    size_t n = _size / 2;
+    uint32_t tmp;
+    for(auto i = 0; i < n; i++) {
+        tmp = _data[i];
+        _data[i] = _data[_size - i - 1];
+        _data[_size - i - 1] = tmp;
+    }
+}
+
+void SStringBuilder::clear() {
+    _data[0] = 0;
+    _size = 0;
+}
+
+SChar SStringBuilder::at(size_t index) const {
+    if(index + 1 >= _size) {
+        return NullChar;
+    } else {
+        return SChar(_data[index]);
+    }
+}
+
 SString SStringBuilder::toString() const {
     return SString::fromSChars((SChar *)_data, _size);
+}
+
+int32_t SStringBuilder::find(const char *str) const {
+    auto sub = SString::fromUTF8(str).toChars();
+    return sstr::BM(_data, _size, sub);
+}
+
+int32_t SStringBuilder::find(const SString &str) const {
+    auto sub = str.toChars();
+    return sstr::BM(_data, _size, sub);
 }
