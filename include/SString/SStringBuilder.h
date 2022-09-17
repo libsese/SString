@@ -37,9 +37,10 @@ namespace sstr {
         void clear();
 
         SChar at(size_t index) const;
+        void set(size_t index, SChar ch);
+        void remove(size_t index);
+        void remove(size_t begin, size_t len);
         // todo 待实现功能
-        // void remove(size_t begin);
-        // void remove(size_t begin, size_t len);
         // void substring(size_t begin);
         // void substring(size_t begin, size_t len);
         // void insert(size_t index, SChar ch);

@@ -31,5 +31,17 @@ int main() {
     printf("sub pos = %d\n", builder.find(tmp1));
     builder.clear();
 
+    builder.append("Hello");
+    builder.remove(0);
+    builder.remove(3);
+    printf("after remove = %s\n", builder.toString().data());
+    //all in -> an
+    builder.set(0, (SChar) 'a');
+    builder.append(" in");
+    builder.remove(1, 4);
+    SString i = builder.toString();
+    printf("after remove = %s\n", i.data());
+    builder.clear();
+
     return 0;
 }
