@@ -114,6 +114,29 @@ SChar sstr::getUnicodeFromUTF8Char(const char *u8char) {
     return getUnicodeCharFromUTF8Char(getSizeFromUTF8Char(*u8char), u8char);
 }
 
+/// \brief 获取指定字符的起始指针
+/// \param str 字符串
+/// \param begin 起始位置(单位 UTF-8 字符)
+/// \return 指定字符的起始指针，超出范围返回 nullptr
+static const char *at(const char *str, size_t begin) {
+    auto p = str;
+    auto i = -1;
+    while (true) {
+        if ('\0' == *p) {
+            p = nullptr;
+            break;
+        }
+        i++;
+        if (i == begin) {
+            break;
+        } else {
+            auto n = sstr::getSizeFromUTF8Char(*p);
+            p += n;
+        }
+    }
+    return p;
+}
+
 SChar::SChar(uint32_t _code) noexcept { code = _code; }
 
 bool SChar::operator==(const SChar &ch) const { return ch.code == code; }
@@ -518,7 +541,7 @@ SString SString::fromUTF8(const char *str) {
 
 SString SString::fromSChars(SChar ch[], size_t size) {
     SString string;
-    for(auto i = 0; i < size; i++) {
+    for (auto i = 0; i < size; i++) {
         string._size += getUTF8SizeFromUnicodeChar(ch[i]);
     }
     string._capacity = (string._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
@@ -586,4 +609,47 @@ SString SString::fromUCS2LE(const wchar_t *str) {
 
     sString._data[sString._size] = '\0';
     return sString;
+}
+
+SString SString::substring(size_t begin) const {
+    SString str;
+    auto p = ::at(_data, begin);
+    if (nullptr == p) return str;
+
+    str._size = _size + _data - p;
+    str._capacity = (str._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    str._data = (char *) malloc(str._capacity);
+    memcpy(str._data, p, str._size);
+    str._data[str._size] = '\0';
+    return str;
+}
+
+SString SString::substring(size_t begin, size_t len) const {
+    SString str;
+    auto start = ::at(_data, begin);
+    if (nullptr == start) return str;
+
+    // pre calculated
+    auto count = 0;
+    auto newSize = 0;
+    auto p = start;
+    while (true) {
+        if ('\0' == *p) {
+            break;
+        } else if (count == len) {
+            break;
+        } else {
+            auto n = sstr::getSizeFromUTF8Char(*p);
+            newSize += n;
+            p += n;
+            count++;
+        }
+    }
+
+    str._size = newSize;
+    str._capacity = (str._size / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    str._data = (char *) malloc(str._capacity);
+    memcpy(str._data, start, str._size);
+    str._data[str._size] = '\0';
+    return str;
 }

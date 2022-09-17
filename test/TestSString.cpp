@@ -81,5 +81,12 @@ int main() {
     std::cout << "toString: " << wstring.toString() << std::endl;
     // std::wcout << L"toWString: " << wstring.toWString() << std::endl;
 
+    auto sub0 = wstring.substring(3);
+    auto sub1 = wstring.substring(3, 5);
+    auto sub2 = wstring.substring(9, 10);
+    printf("sub0 = %s\n", sub0.data());
+    printf("sub1 = %s\n", sub1.data());
+    printf("sub2 = %s\n", sub2.data());
+
     return 0;
 }

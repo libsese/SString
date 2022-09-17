@@ -170,9 +170,12 @@ namespace sstr {
         /// \return 切割结果
         std::vector<SString> split(const char *str) const;
 
-        // todo 待实现功能
-        // SString substring(size_t begin) const;
-        // SString substring(size_t begin, size_t len) const;
+        SString substring(size_t begin) const;
+        /// \brief 截取子串 [begin, begin + len - 1]
+        /// \param begin 起始字符索引
+        /// \param len 截取长度
+        /// \return 子串
+        SString substring(size_t begin, size_t len) const;
 
         // 输出
     public:
