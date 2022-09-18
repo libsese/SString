@@ -43,5 +43,28 @@ int main() {
     printf("after remove = %s\n", i.data());
     builder.clear();
 
+    builder.append("你好 こんにちは Hello");
+    builder.substring(3);
+    printf("after sub = %s\n", builder.toString().data());
+    builder.clear();
+    builder.append("你好 こんにちは Hello");
+    builder.substring(3, 5);
+    printf("after sub = %s\n", builder.toString().data());
+    builder.clear();
+    builder.append("你好 こんにちは Hello");
+    builder.substring(9, 10);
+    printf("after sub = %s\n", builder.toString().data());
+    builder.clear();
+
+    builder.append("I'm kaoru, what's your name?");
+    builder.replace(4, 5, SString::fromUTF8("SString"));
+    printf("after replace = %s\n", builder.toString().data());
+    //I'm SString, what's your name?
+    builder.replace(4, 7, SString::fromUTF8("sstr"));
+    printf("after replace = %s\n", builder.toString().data());
+    builder.insert(8, SString::fromUTF8("ing"));
+    printf("after insert = %s\n", builder.toString().data());
+    builder.clear();
+
     return 0;
 }

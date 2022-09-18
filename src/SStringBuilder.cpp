@@ -207,3 +207,101 @@ void SStringBuilder::remove(size_t begin, size_t len) {
 
     _size -= len;
 }
+
+void SStringBuilder::substring(size_t begin) {
+    if (begin + 1 > _size) return;
+
+    for (size_t i = 0; i < _size - begin; i++) {
+        _data[i] = _data[i + begin];
+    }
+
+    _size -= begin;
+}
+
+void SStringBuilder::substring(size_t begin, size_t len) {
+    if (begin + 1 > _size) return;
+
+    for (size_t i = 0; i < len; i++) {
+        _data[i] = _data[i + begin];
+    }
+
+    _size = len;
+}
+
+void SStringBuilder::insert(size_t index, SChar ch) {
+    if (index + 1 > _size) return;
+
+    // 需要扩容
+    if (_size + 1 > _cap) {
+        reserve((_cap / BLOCK_SIZE + 1) * BLOCK_SIZE);
+    }
+
+    for (size_t i = 0; i < _size - index - 1; i++) {
+        _data[index + i + 1] = _data[index + i];
+    }
+
+    _data[index] = (uint32_t) ch;
+    _size++;
+}
+
+// void SStringBuilder::insert(size_t index, const char *str) {
+// }
+
+void SStringBuilder::insert(size_t index, const SString &str) {
+    if (index + 1 > _size) return;
+
+    auto chars = str.toChars();
+    auto len = chars.size();
+    auto newSize = _size + len;
+    // 需要扩容
+    if (newSize > _cap) {
+        reserve((newSize / BLOCK_SIZE + 1) * BLOCK_SIZE);
+    }
+
+    for (size_t i = 0; i < _size - index; i++) {
+        _data[_size + len - i - 1] = _data[_size - i - 1];
+    }
+
+    for (size_t i = 0; i < len; i++) {
+        _data[index + i] = (uint32_t) chars[i];
+    }
+
+    _size = newSize;
+}
+
+// void SStringBuilder::replace(size_t begin, size_t len, const char *str) {
+// }
+
+void SStringBuilder::replace(size_t begin, size_t len, const SString &str) {
+    if (begin + 1 > _size) return;
+
+    auto chars = str.toChars();
+    auto charSize = chars.size();
+    auto newSize = _size - len + charSize;
+    // 需要扩容
+    if (newSize > _cap) {
+        reserve((newSize / BLOCK_SIZE + 1) * BLOCK_SIZE);
+    }
+
+    // 为插入内容提供空间
+    if (charSize > len) {
+        size_t offset = charSize - len;
+        auto count = _size - begin - len + offset;
+        for (size_t i = 0; i < count; i++) {
+            _data[newSize - i] = _data[_size - i];
+        }
+    } else if (charSize < len) {
+        size_t offset = len - charSize;
+        auto count = _size - begin - len;
+        for (size_t i = 0; i < count; i++) {
+            _data[begin + charSize + i] = _data[begin + charSize + i + offset];
+        }
+    }
+
+    // 直接替换
+    for (size_t i = 0; i < charSize; i++) {
+        _data[begin + i] = (uint32_t) chars[i];
+    }
+
+    _size = newSize;
+}

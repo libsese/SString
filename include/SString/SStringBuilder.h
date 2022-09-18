@@ -40,14 +40,13 @@ namespace sstr {
         void set(size_t index, SChar ch);
         void remove(size_t index);
         void remove(size_t begin, size_t len);
-        // todo 待实现功能
-        // void substring(size_t begin);
-        // void substring(size_t begin, size_t len);
-        // void insert(size_t index, SChar ch);
+        void substring(size_t begin);
+        void substring(size_t begin, size_t len);
+        void insert(size_t index, SChar ch);
         // void insert(size_t index, const char *str);
-        // void insert(size_t index, const SString &str);
+        void insert(size_t index, const SString &str);
         // void replace(size_t begin, size_t len, const char *str);
-        // void replace(size_t begin, size_t len, const SString &str);
+        void replace(size_t begin, size_t len, const SString &str);
     
         SString toString() const;
 
