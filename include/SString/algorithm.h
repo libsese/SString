@@ -1,6 +1,6 @@
 #pragma once
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 
 namespace sstr {
@@ -16,5 +16,33 @@ namespace sstr {
     extern int BM(const uint32_t *str, size_t size, std::vector<SChar> &sub);
 
     extern int NORMAL(const char *str, const char *sub);
+
+    /// 对目标缓存的元素左移
+    /// \warning 使用时务必判断数组是否可能越界
+    /// \tparam T 元素类型
+    /// \param header 目标缓存
+    /// \param len 目标缓存原始大小（已经使用的）
+    /// \param begin 操作起始位置
+    /// \param count 移动距离
+    template<typename T>
+    inline void LeftShiftElement(T *header, size_t len, size_t begin, size_t count) {
+        for (size_t i = 0; i < len - begin; i++) {
+            header[begin + i] = header[begin + count + i];
+        }
+    }
+
+    /// 对目标缓存的元素左移
+    /// \warning 使用时务必判断数组是否可能越界
+    /// \tparam T 元素类型
+    /// \param header 目标缓存
+    /// \param len 目标缓存原始大小（已经使用的）
+    /// \param begin 操作起始位置
+    /// \param count 移动距离
+    template<typename T>
+    inline void RightShiftElement(T *header, size_t len, size_t begin, size_t count) {
+        for(size_t i = 0; i < len - begin; i++) {
+            header[len - 1 + count - i] = header[len - 1 - i];
+        }
+    }
 
 }// namespace sstr

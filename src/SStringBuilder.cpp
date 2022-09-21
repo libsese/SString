@@ -188,11 +188,7 @@ void SStringBuilder::set(size_t index, SChar ch) {
 
 void SStringBuilder::remove(size_t index) {
     if (index + 1 > _size) return;
-
-    for (auto i = index; i < _size; i++) {
-        _data[i] = _data[i + 1];
-    }
-
+    LeftShiftElement(_data, _size, index, 1);
     _size -= 1;
 }
 
@@ -200,11 +196,7 @@ void SStringBuilder::remove(size_t begin, size_t len) {
     if (begin + 1 > _size) return;
     // 限制 len 的大小
     len = _size - begin - 1 < len ? _size - begin - 1 : len;
-
-    for (auto i = begin; i < _size - len; i++) {
-        _data[i] = _data[i + len];
-    }
-
+    LeftShiftElement(_data, _size, begin, len);
     _size -= len;
 }
 
@@ -236,9 +228,7 @@ void SStringBuilder::insert(size_t index, SChar ch) {
         reserve((_cap / BLOCK_SIZE + 1) * BLOCK_SIZE);
     }
 
-    for (size_t i = 0; i < _size - index - 1; i++) {
-        _data[index + i + 1] = _data[index + i];
-    }
+    RightShiftElement(_data, _size, index, 1);
 
     _data[index] = (uint32_t) ch;
     _size++;
@@ -257,15 +247,10 @@ void SStringBuilder::insert(size_t index, const SString &str) {
     if (newSize > _cap) {
         reserve((newSize / BLOCK_SIZE + 1) * BLOCK_SIZE);
     }
-
-    for (size_t i = 0; i < _size - index; i++) {
-        _data[_size + len - i - 1] = _data[_size - i - 1];
-    }
-
+    RightShiftElement(_data, _size, index, len);
     for (size_t i = 0; i < len; i++) {
         _data[index + i] = (uint32_t) chars[i];
     }
-
     _size = newSize;
 }
 
@@ -285,23 +270,14 @@ void SStringBuilder::replace(size_t begin, size_t len, const SString &str) {
 
     // 为插入内容提供空间
     if (charSize > len) {
-        size_t offset = charSize - len;
-        auto count = _size - begin - len + offset;
-        for (size_t i = 0; i < count; i++) {
-            _data[newSize - i] = _data[_size - i];
-        }
+        RightShiftElement(_data, _size, begin + len, charSize - len);
     } else if (charSize < len) {
-        size_t offset = len - charSize;
-        auto count = _size - begin - len;
-        for (size_t i = 0; i < count; i++) {
-            _data[begin + charSize + i] = _data[begin + charSize + i + offset];
-        }
+        LeftShiftElement(_data, _size, begin + charSize, len - charSize);
     }
 
     // 直接替换
     for (size_t i = 0; i < charSize; i++) {
         _data[begin + i] = (uint32_t) chars[i];
     }
-
     _size = newSize;
 }
