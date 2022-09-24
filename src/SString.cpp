@@ -11,7 +11,10 @@
 using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
+using sstr::SStringView;
 using sstr::SStringIterator;
+
+#pragma region Util
 
 size_t sstr::getByteLengthFromUTF8String(const char *str) {
     size_t len = 0;
@@ -137,6 +140,10 @@ static const char *at(const char *str, size_t begin) {
     return p;
 }
 
+#pragma endregion
+
+#pragma region SChar
+
 SChar::SChar(uint32_t _code) noexcept { code = _code; }
 
 bool SChar::operator==(const SChar &ch) const { return ch.code == code; }
@@ -152,6 +159,10 @@ SChar SChar::operator-(const sstr::SChar &ch) const { return SChar(code - ch.cod
 sstr::SChar::operator uint32_t() const { return code; }
 
 SChar sstr::NullChar = SChar(0);
+
+#pragma endregion
+
+#pragma region SStringIterator
 
 SStringIterator::SStringIterator(const char *ref, size_t size, size_t pos) {
     _ref = ref;
@@ -207,17 +218,9 @@ SStringIterator SStringIterator::end() {
     return end;
 }
 
-SString::IteratorType SString::iterator() {
-    return {_data, _size};
-}
+#pragma endregion
 
-SString::IteratorType SString::begin() {
-    return {_data, _size};
-}
-
-SString::IteratorType SString::end() {
-    return {_data, _size, _size};
-}
+#pragma region SString
 
 sstr::SString::~SString() noexcept {
     if (_data) {
@@ -226,137 +229,17 @@ sstr::SString::~SString() noexcept {
     }
 }
 
-bool SString::null() const {
-    if (_data) {
-        return _data[0] == '\0';
-    }
-    return true;
-}
-
-bool SString::emtpy() const {
-    if (_data) {
-        return _data[0] == '\0';
-    }
-    return true;
-}
-
-size_t SString::len() const {
-    size_t len = 0;
-    for (size_t i = 0; i < _size;) {
-        if (0 == _data[i]) return len;
-        auto n = getSizeFromUTF8Char(_data[i]);
-        if (-1 == n) return len;
-        if (i + n > _size) return len;
-        i += n;
-        len++;
-    }
-    return len;
+size_t SString::size() const {
+    return _size;
 }
 
 size_t SString::cap() const {
     return _capacity;
 }
 
-const char *SString::data() const {
-    return _data;
-}
+sstr::SString::SString() noexcept : SStringView() {}
 
-size_t SString::size() const {
-    return _size;
-}
-
-int32_t SString::findByBytes(const char *bytes) const {
-    return BM(_data, bytes);
-}
-
-int32_t SString::find(const sstr::SString &str) const {
-    return find(str._data);
-}
-
-int32_t SString::find(const char *str) const {
-    auto index = BM(_data, str);
-    auto count = 0;
-
-    if (-1 == index) return -1;
-
-    for (auto i = 0; i < index;) {
-        auto n = getSizeFromUTF8Char(_data[i]);
-        i += n;
-        count++;
-    }
-    return count;
-}
-
-SString SString::trim() const {
-    auto newSize = _size;
-    for (auto i = 0; i < _size; i++) {
-        if (_data[i] == ' ') {
-            newSize--;
-        }
-    }
-
-    auto newCap = (newSize / BLOCK_SIZE + 1) * BLOCK_SIZE;
-
-    char *newData = (char *) malloc(newCap);
-    char *p = _data;
-    while (*p == ' ') p++;
-    memcpy(newData, p, newSize);
-    newData[newSize] = '\0';
-
-    SString string;
-    string._size = newSize;
-    string._capacity = newCap;
-    string._data = newData;
-    return string;
-}
-
-SString SString::reverse() const {
-    SString string;
-    string._size = _size;
-    string._capacity = _capacity;
-    string._data = (char *) malloc(_capacity);
-
-    auto index = _size;
-    string._data[index] = '\0';
-
-    for (auto i = 0; i < _size;) {
-        auto n = getSizeFromUTF8Char(_data[i]);
-        index -= n;
-        memcpy(string._data + index, _data + i, n);
-        i += n;
-    }
-
-    return string;
-}
-
-SString SString::append(const char *str) const {
-    SString res;
-    auto len = strlen(str);
-    res._size = _size + len;
-    auto n = res._size / BLOCK_SIZE + 1;
-    res._capacity = n * BLOCK_SIZE;
-    res._data = (char *) malloc(res._capacity);
-    memcpy(res._data + 0, _data, _size);
-    memcpy(res._data + _size, str, len);
-    res._data[res._size] = '\0';
-    return res;
-}
-
-SString SString::append(const sstr::SString &str) const {
-    SString res;
-    res._size = _size + str._size;
-    auto n = res._size / BLOCK_SIZE + 1;
-    res._capacity = n * BLOCK_SIZE;
-    res._data = (char *) malloc(res._capacity);
-    memcpy(res._data + 0, _data, _size);
-    memcpy(res._data + _size, str._data, str._size);
-    res._data[res._size] = '\0';
-    return res;
-}
-
-sstr::SString::SString() noexcept = default;
-
-SString::SString(const char *str, size_t size) {
+SString::SString(const char *str, size_t size) : SStringView() {
     _size = size;
     _capacity = (size / BLOCK_SIZE + 1) * BLOCK_SIZE;
     _data = (char *) malloc(_capacity);
@@ -364,14 +247,14 @@ SString::SString(const char *str, size_t size) {
     _data[size] = '\0';
 }
 
-SString::SString(const sstr::SString &sString) noexcept {
+SString::SString(const sstr::SString &sString) noexcept : SStringView(sString) {
     _capacity = sString._capacity;
     _size = sString._size;
     _data = (char *) malloc(_capacity);
     memcpy(_data, sString._data, _size + 1);
 }
 
-SString::SString(sstr::SString &&sString) noexcept {
+SString::SString(sstr::SString &&sString) noexcept : SStringView() {
     _data = sString._data;
     _capacity = sString._capacity;
     _size = sString._size;
@@ -379,94 +262,6 @@ SString::SString(sstr::SString &&sString) noexcept {
     sString._data = nullptr;
     sString._capacity = 0;
     sString._size = 0;
-}
-
-SChar SString::at(size_t index) const {
-    index += 1;
-    size_t n = 0;
-    for (size_t i = 0; i < _size;) {
-        if (0 == _data[i]) return NullChar;
-        auto c = getSizeFromUTF8Char(_data[i]);
-        if (-1 == c) return NullChar;
-        if (i + c > _size) return NullChar;
-        n++;
-        if (index == n) {
-            return getUnicodeCharFromUTF8Char(c, &_data[i]);
-        }
-        i += c;
-    }
-    return NullChar;
-}
-
-std::vector<SChar> SString::toChars() const {
-    auto len = getByteLengthFromUTF8String(_data);
-    std::vector<SChar> chars;
-    chars.reserve(len);
-    for (size_t i = 0; i < _size;) {
-        if (0 == _data[i]) break;
-        auto n = getSizeFromUTF8Char(_data[i]);
-        if (-1 == n) break;
-        if (i + n > _size) break;
-        chars.emplace_back(getUnicodeCharFromUTF8Char(n, &_data[i]));
-        i += n;
-    }
-    return chars;
-}
-
-std::vector<SString> SString::split(const char *str) const {
-    std::vector<SString> v;
-    auto size = getByteLengthFromUTF8String(str);
-
-    std::string::size_type pos1, pos2;
-    pos2 = BM(_data, str);
-    pos1 = 0;
-    while (true) {
-        v.emplace_back(SString(_data + pos1, pos2 - pos1));
-
-        pos1 = pos2 + size;
-        pos2 = BM(_data + pos1, str);
-        if (-1 == pos2) {
-            v.emplace_back(SString::fromUTF8(_data + pos1));
-            break;
-        } else {
-            pos2 += pos1;
-        }
-    }
-    return v;
-}
-
-std::vector<SString> SString::split(const SString &str) const {
-    return split(str._data);
-}
-
-std::string SString::toString() const {
-    return {_data};
-}
-
-std::unique_ptr<wchar_t[]> SString::toCWString() const {
-#ifdef _WIN32
-    size_t size = MultiByteToWideChar(CP_UTF8, 0, _data, -1, NULL, 0);
-    auto ptr = std::unique_ptr<wchar_t[]>(new wchar_t[size]);
-    MultiByteToWideChar(CP_UTF8, 0, _data, -1, ptr.get(), size);
-    return ptr;
-#else
-    size_t size = len();
-    auto str = new wchar_t[size + 1];
-    auto ptr = std::unique_ptr<wchar_t[]>(str);
-    auto count = 0;
-    for (auto i = 0; i < _size;) {
-        auto n = getSizeFromUTF8Char(_data[i]);
-        str[count] = (wchar_t) (uint32_t) getUnicodeCharFromUTF8Char(n, _data + i);
-        i += n;
-        count++;
-    }
-    str[size] = L'\0';
-    return ptr;
-#endif
-}
-
-std::wstring SString::toWString() const {
-    return {toCWString().get()};
 }
 
 SChar SString::operator[](size_t index) const {
@@ -611,7 +406,180 @@ SString SString::fromUCS2LE(const wchar_t *str) {
     return sString;
 }
 
-SString SString::substring(size_t begin) const {
+
+
+#pragma endregion
+
+#pragma region SStringView
+
+SStringView::SStringView(const char *u8str) noexcept {
+    _data = const_cast<char *>(u8str);
+    _size = sstr::getByteLengthFromUTF8String(_data);
+}
+
+bool SStringView::null() const {
+    if (_data) {
+        return _data[0] == '\0';
+    }
+    return true;
+}
+
+bool SStringView::emtpy() const {
+    if (_data) {
+        return _data[0] == '\0';
+    }
+    return true;
+}
+
+size_t SStringView::size() const {
+    return getByteLengthFromUTF8String(_data);
+}
+
+size_t SStringView::len() const {
+    size_t len = 0;
+    for (size_t i = 0; i < _size;) {
+        if (0 == _data[i]) return len;
+        auto n = getSizeFromUTF8Char(_data[i]);
+        if (-1 == n) return len;
+        if (i + n > _size) return len;
+        i += n;
+        len++;
+    }
+    return len;
+}
+
+const char *SStringView::data() const {
+    return _data;
+}
+
+int32_t SStringView::findByBytes(const char *bytes) const {
+    return BM(_data, bytes);
+}
+
+int32_t SStringView::find(const sstr::SString &str) const {
+    return find(str.data());
+}
+
+int32_t SStringView::find(const char *str) const {
+    auto index = BM(_data, str);
+    auto count = 0;
+
+    if (-1 == index) return -1;
+
+    for (auto i = 0; i < index;) {
+        auto n = getSizeFromUTF8Char(_data[i]);
+        i += n;
+        count++;
+    }
+    return count;
+}
+
+SStringView::IteratorType SStringView::iterator() {
+    return {_data, _size};
+}
+
+SStringView::IteratorType SStringView::begin() {
+    return {_data, _size};
+}
+
+SString::IteratorType SStringView::end() {
+    return {_data, _size, _size};
+}
+
+SString SStringView::trim() const {
+    auto newSize = _size;
+    for (auto i = 0; i < _size; i++) {
+        if (_data[i] == ' ') {
+            newSize--;
+        }
+    }
+
+    auto newCap = (newSize / BLOCK_SIZE + 1) * BLOCK_SIZE;
+
+    char *newData = (char *) malloc(newCap);
+    char *p = _data;
+    while (*p == ' ') p++;
+    memcpy(newData, p, newSize);
+    newData[newSize] = '\0';
+
+    SString string;
+    string._size = newSize;
+    string._capacity = newCap;
+    string._data = newData;
+    return string;
+}
+
+SString SStringView::reverse() const {
+    SString string;
+    string._size = _size;
+    string._capacity = (_size / BLOCK_SIZE + 1) * BLOCK_SIZE;
+    string._data = (char *) malloc(string._capacity);
+
+    auto index = _size;
+    string._data[index] = '\0';
+
+    for (auto i = 0; i < _size;) {
+        auto n = getSizeFromUTF8Char(_data[i]);
+        index -= n;
+        memcpy(string._data + index, _data + i, n);
+        i += n;
+    }
+
+    return string;
+}
+
+SString SStringView::append(const char *str) const {
+    SString res;
+    auto len = strlen(str);
+    res._size = _size + len;
+    auto n = res._size / BLOCK_SIZE + 1;
+    res._capacity = n * BLOCK_SIZE;
+    res._data = (char *) malloc(res._capacity);
+    memcpy(res._data + 0, _data, _size);
+    memcpy(res._data + _size, str, len);
+    res._data[res._size] = '\0';
+    return res;
+}
+
+SString SStringView::append(const sstr::SString &str) const {
+    SString res;
+    res._size = _size + str._size;
+    auto n = res._size / BLOCK_SIZE + 1;
+    res._capacity = n * BLOCK_SIZE;
+    res._data = (char *) malloc(res._capacity);
+    memcpy(res._data + 0, _data, _size);
+    memcpy(res._data + _size, str._data, str._size);
+    res._data[res._size] = '\0';
+    return res;
+}
+
+std::vector<SString> SStringView::split(const char *str) const {
+    std::vector<SString> v;
+    auto size = getByteLengthFromUTF8String(str);
+
+    std::string::size_type pos1, pos2;
+    pos2 = BM(_data, str);
+    pos1 = 0;
+    while (true) {
+        v.emplace_back(SString(_data + pos1, pos2 - pos1));
+
+        pos1 = pos2 + size;
+        pos2 = BM(_data + pos1, str);
+        if (-1 == pos2) {
+            v.emplace_back(SString::fromUTF8(_data + pos1));
+            break;
+        } else {
+            pos2 += pos1;
+        }
+    }
+    return v;
+}
+
+std::vector<SString> SStringView::split(const SString &str) const {
+    return split(str._data);
+}
+
+SString SStringView::substring(size_t begin) const {
     SString str;
     auto p = ::at(_data, begin);
     if (nullptr == p) return str;
@@ -624,7 +592,7 @@ SString SString::substring(size_t begin) const {
     return str;
 }
 
-SString SString::substring(size_t begin, size_t len) const {
+SString SStringView::substring(size_t begin, size_t len) const {
     SString str;
     auto start = ::at(_data, begin);
     if (nullptr == start) return str;
@@ -653,3 +621,67 @@ SString SString::substring(size_t begin, size_t len) const {
     str._data[str._size] = '\0';
     return str;
 }
+
+std::vector<SChar> SStringView::toChars() const {
+    auto len = getByteLengthFromUTF8String(_data);
+    std::vector<SChar> chars;
+    chars.reserve(len);
+    for (size_t i = 0; i < _size;) {
+        if (0 == _data[i]) break;
+        auto n = getSizeFromUTF8Char(_data[i]);
+        if (-1 == n) break;
+        if (i + n > _size) break;
+        chars.emplace_back(getUnicodeCharFromUTF8Char(n, &_data[i]));
+        i += n;
+    }
+    return chars;
+}
+
+std::string SStringView::toString() const {
+    return {_data};
+}
+
+std::unique_ptr<wchar_t[]> SStringView::toCWString() const {
+#ifdef _WIN32
+    size_t size = MultiByteToWideChar(CP_UTF8, 0, _data, -1, NULL, 0);
+    auto ptr = std::unique_ptr<wchar_t[]>(new wchar_t[size]);
+    MultiByteToWideChar(CP_UTF8, 0, _data, -1, ptr.get(), size);
+    return ptr;
+#else
+    size_t size = len();
+    auto str = new wchar_t[size + 1];
+    auto ptr = std::unique_ptr<wchar_t[]>(str);
+    auto count = 0;
+    for (auto i = 0; i < _size;) {
+        auto n = getSizeFromUTF8Char(_data[i]);
+        str[count] = (wchar_t) (uint32_t) getUnicodeCharFromUTF8Char(n, _data + i);
+        i += n;
+        count++;
+    }
+    str[size] = L'\0';
+    return ptr;
+#endif
+}
+
+std::wstring SStringView::toWString() const {
+    return {toCWString().get()};
+}
+
+SChar SStringView::at(size_t index) const {
+    index += 1;
+    size_t n = 0;
+    for (size_t i = 0; i < _size;) {
+        if (0 == _data[i]) return NullChar;
+        auto c = getSizeFromUTF8Char(_data[i]);
+        if (-1 == c) return NullChar;
+        if (i + c > _size) return NullChar;
+        n++;
+        if (index == n) {
+            return getUnicodeCharFromUTF8Char(c, &_data[i]);
+        }
+        i += c;
+    }
+    return NullChar;
+}
+
+#pragma endregion
