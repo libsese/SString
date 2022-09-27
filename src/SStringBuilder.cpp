@@ -16,7 +16,7 @@ SStringBuilder::SStringBuilder(const SStringBuilder &builder) {
     memcpy(_data, builder._data, (_size + 1) * sizeof(uint32_t));
 }
 
-SStringBuilder::SStringBuilder(SStringBuilder &&builder) {
+SStringBuilder::SStringBuilder(SStringBuilder &&builder)  noexcept {
     _data = builder._data;
     _size = builder._size;
     _cap = builder._cap;
@@ -77,7 +77,7 @@ void SStringBuilder::append(const char *str) {
     _size = newSize;
 }
 
-void SStringBuilder::append(const SString &str) {
+void SStringBuilder::append(const SStringView &str) {
     size_t count = str.len();
     size_t newSize = count + _size;
 
@@ -171,11 +171,11 @@ SString SStringBuilder::toString() const {
 }
 
 int32_t SStringBuilder::find(const char *str) const {
-    auto sub = SString::fromUTF8(str).toChars();
+    auto sub = SStringView(str).toChars();
     return sstr::BM(_data, _size, sub);
 }
 
-int32_t SStringBuilder::find(const SString &str) const {
+int32_t SStringBuilder::find(const SStringView &str) const {
     auto sub = str.toChars();
     return sstr::BM(_data, _size, sub);
 }
@@ -213,6 +213,9 @@ void SStringBuilder::substring(size_t begin) {
 void SStringBuilder::substring(size_t begin, size_t len) {
     if (begin + 1 > _size) return;
 
+    // 限制 len 的大小
+    len = _size - begin - 1 < len ? _size - begin : len;
+
     for (size_t i = 0; i < len; i++) {
         _data[i] = _data[i + begin];
     }
@@ -234,10 +237,25 @@ void SStringBuilder::insert(size_t index, SChar ch) {
     _size++;
 }
 
-// void SStringBuilder::insert(size_t index, const char *str) {
-// }
+void SStringBuilder::insert(size_t index, const char *u8str) {
+    if (index + 1 > _size) return;
 
-void SStringBuilder::insert(size_t index, const SString &str) {
+    auto str = SStringView(u8str);
+    auto chars = str.toChars();
+    auto len = chars.size();
+    auto newSize = _size + len;
+    // 需要扩容
+    if (newSize > _cap) {
+        reserve((newSize / BLOCK_SIZE + 1) * BLOCK_SIZE);
+    }
+    RightShiftElement(_data, _size, index, len);
+    for (size_t i = 0; i < len; i++) {
+        _data[index + i] = (uint32_t) chars[i];
+    }
+    _size = newSize;
+}
+
+void SStringBuilder::insert(size_t index, const SStringView &str) {
     if (index + 1 > _size) return;
 
     auto chars = str.toChars();
@@ -254,10 +272,33 @@ void SStringBuilder::insert(size_t index, const SString &str) {
     _size = newSize;
 }
 
-// void SStringBuilder::replace(size_t begin, size_t len, const char *str) {
-// }
+void SStringBuilder::replace(size_t begin, size_t len, const char *u8str) {
+    if (begin + 1 > _size) return;
 
-void SStringBuilder::replace(size_t begin, size_t len, const SString &str) {
+    auto str = SStringView(u8str);
+    auto chars = str.toChars();
+    auto charSize = chars.size();
+    auto newSize = _size - len + charSize;
+    // 需要扩容
+    if (newSize > _cap) {
+        reserve((newSize / BLOCK_SIZE + 1) * BLOCK_SIZE);
+    }
+
+    // 为插入内容提供空间
+    if (charSize > len) {
+        RightShiftElement(_data, _size, begin + len, charSize - len);
+    } else if (charSize < len) {
+        LeftShiftElement(_data, _size, begin + charSize, len - charSize);
+    }
+
+    // 直接替换
+    for (size_t i = 0; i < charSize; i++) {
+        _data[begin + i] = (uint32_t) chars[i];
+    }
+    _size = newSize;
+}
+
+void SStringBuilder::replace(size_t begin, size_t len, const SStringView &str) {
     if (begin + 1 > _size) return;
 
     auto chars = str.toChars();
