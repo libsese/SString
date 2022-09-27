@@ -1,3 +1,9 @@
+/// \file SStringBuilder.h
+/// \date 2022-9-27
+/// \version 0.1
+/// \author kaoru
+/// \brief 包含 SStringBuilder
+
 #pragma once
 #include <SString/SString.h>
 

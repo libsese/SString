@@ -1,3 +1,9 @@
+/// \file SString.h
+/// \date 2022-9-27
+/// \version 0.1
+/// \author kaoru
+/// \brief 包含 SString 核心功能， SChar、SStringView 和 SString
+
 #pragma once
 #include <cstddef>
 #include <cstdint>
