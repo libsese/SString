@@ -2,6 +2,7 @@
 
 using sstr::SChar;
 using sstr::SString;
+using sstr::SStringView;
 using sstr::SStringBuilder;
 using sstr::NullChar;
 
@@ -10,7 +11,7 @@ int main() {
     printf("builder.null = %s\n", builder.null() ? "true" : "false");
 
     builder.append("你好，");
-    auto tmp0 = SString::fromUTF8("SString");
+    auto tmp0 = SStringView("SString");
     builder.append(tmp0);
     printf("after append = %s\n", builder.toString().data());
     builder.clear();
@@ -27,7 +28,7 @@ int main() {
 
     builder.append("こんにちは");
     printf("sub pos = %d\n", builder.find("にち"));
-    auto tmp1 = SString::fromUTF8("んに");
+    auto tmp1 = SStringView("んに");
     printf("sub pos = %d\n", builder.find(tmp1));
     builder.clear();
 
@@ -53,6 +54,7 @@ int main() {
     builder.clear();
     builder.append("你好 こんにちは Hello");
     builder.substring(9, 10);
+    auto s = builder.toString();
     printf("after sub = %s\n", builder.toString().data());
     builder.clear();
 

@@ -7,8 +7,8 @@ namespace sstr {
         // 构造相关
     public:
         SStringBuilder(const SStringBuilder &builder);
-        SStringBuilder(SStringBuilder &&builder);
-        SStringBuilder(size_t bufferSize);
+        SStringBuilder(SStringBuilder &&builder) noexcept;
+        explicit SStringBuilder(size_t bufferSize);
         ~SStringBuilder();
 
         // 基础功能
@@ -26,9 +26,9 @@ namespace sstr {
         void trim();
         void reverse();
         int32_t find(const char *str) const;
-        int32_t find(const SString &str) const;
+        int32_t find(const SStringView &str) const;
         void append(const char *str);
-        void append(const SString &str);
+        void append(const SStringView &str);
         
         // 不会支持
         // std::vector<SString> split(const char *str) const;
@@ -43,10 +43,10 @@ namespace sstr {
         void substring(size_t begin);
         void substring(size_t begin, size_t len);
         void insert(size_t index, SChar ch);
-        // void insert(size_t index, const char *str);
-        void insert(size_t index, const SString &str);
-        // void replace(size_t begin, size_t len, const char *str);
-        void replace(size_t begin, size_t len, const SString &str);
+        void insert(size_t index, const char *str);
+        void insert(size_t index, const SStringView &str);
+        void replace(size_t begin, size_t len, const char *str);
+        void replace(size_t begin, size_t len, const SStringView &str);
     
         SString toString() const;
 

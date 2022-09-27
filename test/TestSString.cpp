@@ -4,6 +4,7 @@
 
 using sstr::SChar;
 using sstr::SString;
+using sstr::SStringView;
 
 int main() {
     const char *str = "你好 こんにちは Hello";
@@ -38,15 +39,15 @@ int main() {
     puts("");
     puts("");
 
-    auto string1 = SString::fromUTF8(str);
+    auto string1 = SStringView(str);
     printf("string1.data = %s\n", string1.data());
     printf("string == string1 = %s\n", string == string1 ? "true" : "false");
     printf("string != str = %s\n", string != str ? "true" : "false");
     printf("string == str1 = %s\n", string == str1 ? "true" : "false");
     puts("");
 
-    SString front = SString::fromUTF8("你好");
-    SString back = SString::fromUTF8("Hello");
+    SStringView front = SStringView("你好");
+    SStringView back = SStringView("Hello");
     const char *extra = "こんにちは";
     SString res0 = front + back;
     printf("front + back = %s\n", res0.data());
@@ -58,13 +59,13 @@ int main() {
     printf("find by utf-8 char: %d\n", string.find("にちは"));
     puts("");
 
-    SString spaceString = SString::fromUTF8("  こんにちは  ");
+    SStringView spaceString = SStringView("  こんにちは  ");
     SString trimString = spaceString.trim();
     printf("after trim: %s\n", trimString.data());
     printf("after reverse: %s\n", trimString.reverse().data());
     puts("");
 
-    auto spiltString = SString::fromUTF8("こんにちは、わたくしはSStringです");
+    SStringView spiltString = SStringView("こんにちは、わたくしはSStringです");
     printf("spilt string: %s\n", spiltString.data());
     auto spiltRes = spiltString.split("は");
     for (const auto &i: spiltRes) {

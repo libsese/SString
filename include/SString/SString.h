@@ -128,7 +128,7 @@ namespace sstr {
         /// 查找字符串，索引单位是字数
         /// \param str 子串
         /// \return 子串位置
-        int32_t find(const SString &str) const;
+        int32_t find(const SStringView &str) const;
 
         /// 查找字符串，索引单位是字数
         /// \param u8str 子串
@@ -152,7 +152,7 @@ namespace sstr {
         /// 尾加字符串
         /// \param str 待尾加字符串
         /// \return 尾加结果字符串
-        SString append(const SString &str) const;
+        SString append(const SStringView &str) const;
 
         /// 尾加字符串
         /// \param u8str 待尾加字符串
@@ -162,7 +162,7 @@ namespace sstr {
         /// 切割字符串
         /// \param str 切割标识符
         /// \return 切割结果
-        std::vector<SString> split(const SString &str) const;
+        std::vector<SString> split(const SStringView &str) const;
 
         /// 切割字符串
         /// \deprecated 尾加对象的字符串编码必须也是 UTF-8，否则不建议使用
@@ -182,6 +182,15 @@ namespace sstr {
         std::string toString() const;
         std::wstring toWString() const;
         std::unique_ptr<wchar_t[]> toCWString() const;
+
+    public:
+        SChar operator[](size_t index) const;
+        bool operator!=(const SStringView &str) const;
+        bool operator!=(const char *u8str) const;
+        bool operator==(const SStringView &str) const;
+        bool operator==(const char *u8str) const;
+        SString operator+(const SStringView &str) const;
+        SString operator+(const char *u8str) const;
 
     protected:
         char *_data = nullptr;
@@ -212,17 +221,10 @@ namespace sstr {
         size_t size() const override;
 
     public:
-        SChar operator[](size_t index) const;
-        bool operator!=(const SString &str) const;
-        bool operator!=(const char *u8str) const;
-        bool operator==(const SString &str) const;
-        bool operator==(const char *u8str) const;
-        SString operator+(const SString &str) const;
-        SString operator+(const char *u8str) const;
-        void operator+=(const SString &str);
+        void operator+=(const SStringView &str);
         void operator+=(const char *u8str);
 
-    private:
+    protected:
         size_t _capacity = 0;
     };
 }// namespace sstr

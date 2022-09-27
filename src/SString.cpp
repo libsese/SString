@@ -264,65 +264,6 @@ SString::SString(sstr::SString &&sString) noexcept : SStringView() {
     sString._size = 0;
 }
 
-SChar SString::operator[](size_t index) const {
-    return at(index);
-}
-
-bool SString::operator!=(const char *str) const {
-    return 0 != strcmp(_data, str);
-}
-
-bool SString::operator!=(const sstr::SString &str) const {
-    return 0 != strcmp(_data, str._data);
-}
-
-bool SString::operator==(const sstr::SString &str) const {
-    return 0 == strcmp(_data, str._data);
-}
-
-bool SString::operator==(const char *str) const {
-    return 0 == strcmp(_data, str);
-}
-
-SString SString::operator+(const SString &str) const {
-    return append(str);
-}
-
-SString SString::operator+(const char *str) const {
-    return append(str);
-}
-
-void SString::operator+=(const char *str) {
-    auto len = strlen(str);
-    auto newSize = _size + len;
-    auto n = newSize / BLOCK_SIZE + 1;
-    _capacity = n * BLOCK_SIZE;
-
-    auto newData = (char *) malloc(_capacity);
-    memcpy(newData + 0, _data, _size);
-    memcpy(newData + _size, str, len);
-    newData[newSize] = '\0';
-    free(_data);
-
-    _data = newData;
-    _size = newSize;
-}
-
-void SString::operator+=(const sstr::SString &str) {
-    auto newSize = _size + str._size;
-    auto n = newSize / BLOCK_SIZE + 1;
-    _capacity = n * BLOCK_SIZE;
-
-    auto newData = (char *) malloc(_capacity);
-    memcpy(newData + 0, _data, _size);
-    memcpy(newData + _size, str._data, str._size);
-    newData[newSize] = '\0';
-    free(_data);
-
-    _data = newData;
-    _size = newSize;
-}
-
 SString SString::fromUTF8(const char *str) {
     SString sString;
     sString._size = getByteLengthFromUTF8String(str);
@@ -406,7 +347,36 @@ SString SString::fromUCS2LE(const wchar_t *str) {
     return sString;
 }
 
+void SString::operator+=(const char *str) {
+    auto len = strlen(str);
+    auto newSize = _size + len;
+    auto n = newSize / BLOCK_SIZE + 1;
+    _capacity = n * BLOCK_SIZE;
 
+    auto newData = (char *) malloc(_capacity);
+    memcpy(newData + 0, _data, _size);
+    memcpy(newData + _size, str, len);
+    newData[newSize] = '\0';
+    free(_data);
+
+    _data = newData;
+    _size = newSize;
+}
+
+void SString::operator+=(const sstr::SStringView &str) {
+    auto newSize = _size + str.size();
+    auto n = newSize / BLOCK_SIZE + 1;
+    _capacity = n * BLOCK_SIZE;
+
+    auto newData = (char *) malloc(_capacity);
+    memcpy(newData + 0, _data, _size);
+    memcpy(newData + _size, str.data(), str.size());
+    newData[newSize] = '\0';
+    free(_data);
+
+    _data = newData;
+    _size = newSize;
+}
 
 #pragma endregion
 
@@ -456,7 +426,7 @@ int32_t SStringView::findByBytes(const char *bytes) const {
     return BM(_data, bytes);
 }
 
-int32_t SStringView::find(const sstr::SString &str) const {
+int32_t SStringView::find(const sstr::SStringView &str) const {
     return find(str.data());
 }
 
@@ -541,7 +511,7 @@ SString SStringView::append(const char *str) const {
     return res;
 }
 
-SString SStringView::append(const sstr::SString &str) const {
+SString SStringView::append(const sstr::SStringView &str) const {
     SString res;
     res._size = _size + str._size;
     auto n = res._size / BLOCK_SIZE + 1;
@@ -575,7 +545,7 @@ std::vector<SString> SStringView::split(const char *str) const {
     return v;
 }
 
-std::vector<SString> SStringView::split(const SString &str) const {
+std::vector<SString> SStringView::split(const SStringView &str) const {
     return split(str._data);
 }
 
@@ -682,6 +652,34 @@ SChar SStringView::at(size_t index) const {
         i += c;
     }
     return NullChar;
+}
+
+SChar SStringView::operator[](size_t index) const {
+    return at(index);
+}
+
+bool SStringView::operator!=(const char *str) const {
+    return 0 != strcmp(_data, str);
+}
+
+bool SStringView::operator!=(const sstr::SStringView &str) const {
+    return 0 != strcmp(_data, str._data);
+}
+
+bool SStringView::operator==(const sstr::SStringView &str) const {
+    return 0 == strcmp(_data, str._data);
+}
+
+bool SStringView::operator==(const char *str) const {
+    return 0 == strcmp(_data, str);
+}
+
+SString SStringView::operator+(const SStringView &str) const {
+    return append(str);
+}
+
+SString SStringView::operator+(const char *str) const {
+    return append(str);
 }
 
 #pragma endregion
