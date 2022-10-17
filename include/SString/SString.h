@@ -12,9 +12,15 @@
 #include <string>
 #include <vector>
 
+#ifdef _WIN32
+#define API __declspec(dllexport)
+#else
+#define API
+#endif
+
 namespace sstr {
 
-    struct SChar final {
+    struct API SChar final {
         uint32_t code = 0;
 
         explicit SChar(uint32_t code) noexcept;
@@ -67,7 +73,7 @@ namespace sstr {
     /// \return Unicode 字符
     extern SChar getUnicodeCharFromUTF8Char(char size, const char *ch);
 
-    class SStringIterator final : public std::iterator<std::forward_iterator_tag,
+    class API SStringIterator final : public std::iterator<std::forward_iterator_tag,
                                                        SChar,
                                                        SChar,
                                                        const char *,
@@ -94,9 +100,9 @@ namespace sstr {
         SChar _ch = NullChar;
     };
 
-    class SString;
+    class API SString;
 
-    class SStringView {
+    class API SStringView {
     public:
         SStringView() noexcept = default;
         explicit SStringView(const char *u8str) noexcept;
@@ -203,7 +209,7 @@ namespace sstr {
         size_t _size = 0;
     };
 
-    class SString final : public SStringView {
+    class API SString final : public SStringView {
     public:
         friend class SStringView;
 

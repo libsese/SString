@@ -9,7 +9,7 @@
 
 namespace sstr {
 
-    class SStringBuilder final {
+    class API SStringBuilder final {
         // 构造相关
     public:
         SStringBuilder(const SStringBuilder &builder);
