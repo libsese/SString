@@ -6,7 +6,7 @@ using sstr::SChar;
 using sstr::SString;
 using sstr::SStringView;
 
-int main() {
+void testV1_0() {
     const char *str = "你好 こんにちは Hello";
     auto string = SString::fromUTF8(str);
     printf("string.data = %s\n", string.data());
@@ -88,6 +88,23 @@ int main() {
     printf("sub0 = %s\n", sub0.data());
     printf("sub1 = %s\n", sub1.data());
     printf("sub2 = %s\n", sub2.data());
+}
 
+void testV1_1() {
+    auto str = SStringView();
+    printf("str.null = %s\n", str.null() ? "true" : "false");
+
+    str = SStringView("你吃了吗？");
+    auto endsWord = SStringView("吗？");
+    printf("str.endsWith = %s\n", str.endsWith(endsWord) ? "true" : "false");
+
+    str = SStringView("你好 hello");
+    printf("str.isLower = %s\n", str.isLower() ? "true" : "false");
+    printf("str.isUpper = %s\n", str.isUpper() ? "true" : "false");
+}
+
+int main() {
+    // testV1_0();
+    testV1_1();
     return 0;
 }

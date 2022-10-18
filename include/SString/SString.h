@@ -115,9 +115,9 @@ namespace sstr {
         IteratorType end();
 
     public:
-        /// 等价于 emtpy
-        /// \retval true 字符串为空
-        /// \retval false 字符串不为空
+        /// data 是否为 nullptr
+        /// \retval true
+        /// \retval false
         bool null() const;
 
         /// 字符串是否为空
@@ -189,6 +189,16 @@ namespace sstr {
         /// \return 子串
         SString substring(size_t begin, size_t len) const;
 
+        /// \brief 字符串是否以某个子串结尾
+        /// \param str 匹配子串
+        /// \return 结果
+        bool endsWith(const SStringView &str) const;
+
+        /// 字母是否为全小写
+        bool isLower() const;
+        /// 字母是否为全大写
+        bool isUpper() const;
+
         SChar at(size_t index) const;
         std::vector<SChar> toChars() const;
         std::string toString() const;
@@ -204,6 +214,8 @@ namespace sstr {
         SString operator+(const SStringView &str) const;
         SString operator+(const char *u8str) const;
 
+//        SString toLower() const;
+//        SString toUpper() const;
     protected:
         char *_data = nullptr;
         size_t _size = 0;
@@ -231,6 +243,9 @@ namespace sstr {
         /// 获取缓冲区已用大小
         /// \return 缓冲区已用大小
         size_t size() const override;
+
+//        void toLower();
+//        void toUpper();
 
     public:
         void operator+=(const SStringView &str);

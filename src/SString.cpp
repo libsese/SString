@@ -11,8 +11,8 @@
 using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
-using sstr::SStringView;
 using sstr::SStringIterator;
+using sstr::SStringView;
 
 #pragma region Util
 
@@ -382,16 +382,34 @@ void SString::operator+=(const sstr::SStringView &str) {
 
 #pragma region SStringView
 
+bool SStringView::endsWith(const sstr::SStringView &str) const {
+    if (str._size > this->_size) return false;
+
+    auto tmp = this->_data + this->_size - str._size;
+    return strcmp(tmp, str._data) == 0;
+}
+
+bool SStringView::isLower() const {
+    for (int i = 0; i < _size; ++i) {
+        if (_data[i] > 'A' && _data[i] < 'Z') return false;
+    }
+    return true;
+}
+
+bool SStringView::isUpper() const {
+    for (int i = 0; i < _size; ++i) {
+        if (_data[i] > 'a' && _data[i] < 'z') return false;
+    }
+    return true;
+}
+
 SStringView::SStringView(const char *u8str) noexcept {
     _data = const_cast<char *>(u8str);
     _size = sstr::getByteLengthFromUTF8String(_data);
 }
 
 bool SStringView::null() const {
-    if (_data) {
-        return _data[0] == '\0';
-    }
-    return true;
+    return _data == nullptr;
 }
 
 bool SStringView::emtpy() const {
