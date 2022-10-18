@@ -199,6 +199,11 @@ namespace sstr {
         /// 字母是否为全大写
         bool isUpper() const;
 
+        /// 创建字母转为全小写的副本
+        SString toLower() const;
+        /// 创建字母转为全大写的副本
+        SString toUpper() const;
+
         SChar at(size_t index) const;
         std::vector<SChar> toChars() const;
         std::string toString() const;
@@ -214,8 +219,6 @@ namespace sstr {
         SString operator+(const SStringView &str) const;
         SString operator+(const char *u8str) const;
 
-//        SString toLower() const;
-//        SString toUpper() const;
     protected:
         char *_data = nullptr;
         size_t _size = 0;
@@ -244,8 +247,10 @@ namespace sstr {
         /// \return 缓冲区已用大小
         size_t size() const override;
 
-//        void toLower();
-//        void toUpper();
+        /// 将字符串转换为全小写的形式
+        void toLower();
+        /// 将字符串转换为全大写的形式
+        void toUpper();
 
     public:
         void operator+=(const SStringView &str);

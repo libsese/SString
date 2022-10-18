@@ -101,6 +101,15 @@ void testV1_1() {
     str = SStringView("你好 hello");
     printf("str.isLower = %s\n", str.isLower() ? "true" : "false");
     printf("str.isUpper = %s\n", str.isUpper() ? "true" : "false");
+
+    auto upper = str.toUpper();
+    auto lower = str.toLower();
+    printf("str.toUpper = %s\n", upper.data());
+    printf("str.toLower = %s\n", lower.data());
+    lower.toUpper();
+    printf("lower.toUpper = %s\n", lower.data());
+    upper.toLower();
+    printf("upper.toLower = %s\n", upper.data());
 }
 
 int main() {

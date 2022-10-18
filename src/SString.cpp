@@ -140,6 +140,20 @@ static const char *at(const char *str, size_t begin) {
     return p;
 }
 
+static void toLower(char *str) {
+    while (0 != *str) {
+        if (*str >= 'A' && *str <= 'Z') *str += 32;
+        ++str;
+    }
+}
+
+static void toUpper(char *str) {
+    while (0 != *str) {
+        if (*str >= 'a' && *str <= 'z') *str -= 32;
+        ++str;
+    }
+}
+
 #pragma endregion
 
 #pragma region SChar
@@ -262,6 +276,14 @@ SString::SString(sstr::SString &&sString) noexcept : SStringView() {
     sString._data = nullptr;
     sString._capacity = 0;
     sString._size = 0;
+}
+
+void SString::toLower() {
+    ::toLower(_data);
+}
+
+void SString::toUpper() {
+    ::toUpper(_data);
 }
 
 SString SString::fromUTF8(const char *str) {
@@ -401,6 +423,18 @@ bool SStringView::isUpper() const {
         if (_data[i] > 'a' && _data[i] < 'z') return false;
     }
     return true;
+}
+
+SString SStringView::toLower() const {
+    SString str(_data, _size);
+    ::toLower(str._data);
+    return str;
+}
+
+SString SStringView::toUpper() const {
+    SString str(_data, _size);
+    ::toUpper(str._data);
+    return str;
 }
 
 SStringView::SStringView(const char *u8str) noexcept {
