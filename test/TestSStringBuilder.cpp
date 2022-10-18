@@ -4,7 +4,6 @@ using sstr::SChar;
 using sstr::SString;
 using sstr::SStringView;
 using sstr::SStringBuilder;
-using sstr::NullChar;
 
 int main() {
     SStringBuilder builder(1024);

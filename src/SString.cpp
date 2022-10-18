@@ -8,11 +8,12 @@
 
 #define BLOCK_SIZE 16
 
-using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
 using sstr::SStringIterator;
 using sstr::SStringView;
+
+static SChar NullChar(0);
 
 #pragma region Util
 
@@ -171,8 +172,6 @@ SChar SChar::operator+(const sstr::SChar &ch) const { return SChar(ch.code + cod
 SChar SChar::operator-(const sstr::SChar &ch) const { return SChar(code - ch.code); }
 
 sstr::SChar::operator uint32_t() const { return code; }
-
-SChar sstr::NullChar = SChar(0);
 
 #pragma endregion
 

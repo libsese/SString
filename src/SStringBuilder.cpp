@@ -4,7 +4,6 @@
 
 #define BLOCK_SIZE 1024
 
-using sstr::NullChar;
 using sstr::SChar;
 using sstr::SString;
 using sstr::SStringBuilder;
@@ -160,7 +159,7 @@ void SStringBuilder::clear() {
 
 SChar SStringBuilder::at(size_t index) const {
     if (index + 1 >= _size) {
-        return NullChar;
+        return SChar(0);
     } else {
         return SChar(_data[index]);
     }

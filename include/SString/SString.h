@@ -39,39 +39,36 @@ namespace sstr {
         explicit operator uint32_t() const;
     };
 
-    /// 空字符 '\0'
-    extern SChar NullChar;
-
     /// 获取 UTF-8 字符代码
     /// \param u8char UTF-8 字符
     /// \return 字符代码
-    extern SChar getUnicodeFromUTF8Char(const char *u8char);
+    extern API SChar getUnicodeFromUTF8Char(const char *u8char);
 
     /// 获取 UTF-8 字符串长度
     /// \param str 字符串
     /// \return 字符串长度
-    extern "C" size_t getStringLengthFromUTF8String(const char *str);
+    extern "C" API size_t getStringLengthFromUTF8String(const char *str);
 
     /// 获取 UTF-8 字符串字节长度
     /// \param str 目标字符串
     /// \return 字符串字节长度
-    extern "C" size_t getByteLengthFromUTF8String(const char *str);
+    extern "C" API size_t getByteLengthFromUTF8String(const char *str);
 
     /// 获取 UTF-8 字符占位字节数
     /// \param ch 目标字符
     /// \return 字符占位字节数
-    extern "C" char getSizeFromUTF8Char(char ch);
+    extern "C" API char getSizeFromUTF8Char(char ch);
 
     /// 从 SChar 中获取该字符在 UTF-8 中的字节占位字节数
     /// \param ch Unicode 字符
     /// \return 占位字节数
-    extern char getUTF8SizeFromUnicodeChar(SChar ch);
+    extern API char getUTF8SizeFromUnicodeChar(SChar ch);
 
     /// 从 UTF-8 字符串中获取 Unicode 字符
     /// \param size 该 UTF-8 占位字节数
     /// \param ch UTF-8 字符起始位置
     /// \return Unicode 字符
-    extern SChar getUnicodeCharFromUTF8Char(char size, const char *ch);
+    extern API SChar getUnicodeCharFromUTF8Char(char size, const char *ch);
 
     class API SStringIterator final : public std::iterator<std::forward_iterator_tag,
                                                        SChar,
@@ -97,7 +94,7 @@ namespace sstr {
         const char *_ref = nullptr;
         size_t _pos = 0;
         size_t _size = 0;
-        SChar _ch = NullChar;
+        SChar _ch = SChar(0);
     };
 
     class API SString;
