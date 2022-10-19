@@ -18,6 +18,12 @@ CMake 配置示例
 add_compile_options("/utf-8")
 ```
 
+XMake 配置示例
+
+```cmake
+add_cxxflags("/utf-8")
+```
+
 *这些改动都是为了使编译器在编码字符串进入二进制文件时，依旧保持 UTF-8 的编码方式。*
 
 
