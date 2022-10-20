@@ -249,6 +249,13 @@ namespace sstr {
         /// 将字符串转换为全大写的形式
         void toUpper();
 
+        /// \brief 获取 data 指针
+        /// \deprecated 通常不应该使用该函数
+        char *data();
+        /// \brief 更新 size 属性
+        /// \deprecated 通常不应该使用该函数
+        void update();
+
     public:
         void operator+=(const SStringView &str);
         void operator+=(const char *u8str);
