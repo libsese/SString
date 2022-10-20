@@ -13,7 +13,7 @@ void testV1_0() {
     printf("string.len = %lu\n", string.len());
     printf("string.cap = %lu\n", string.cap());
     printf("string.size = %lu\n", string.size());
-    printf("string.emtpy = %s\n", string.emtpy() ? "true" : "false");
+    printf("string.empty = %s\n", string.empty() ? "true" : "false");
     puts("");
 
     const char *s1 = "你こH";

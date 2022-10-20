@@ -453,7 +453,7 @@ bool SStringView::null() const {
     return _data == nullptr;
 }
 
-bool SStringView::emtpy() const {
+bool SStringView::empty() const {
     if (_data) {
         return _data[0] == '\0';
     }

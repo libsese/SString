@@ -120,7 +120,7 @@ namespace sstr {
         /// 字符串是否为空
         /// \retval true 字符串为空
         /// \retval false 字符串不为空
-        bool emtpy() const;
+        bool empty() const;
 
         /// 获取字符串中字符个数
         /// \return 字符个数
