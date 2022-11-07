@@ -12,7 +12,7 @@ using sstr::SChar;
 using sstr::SString;
 using sstr::SStringView;
 
-#if (__cplusplus < 201703L)
+#if (__cplusplus < 201703L && _HAS_CXX17 == 0)
 using sstr::SStringIterator;
 #endif
 
@@ -179,7 +179,7 @@ sstr::SChar::operator uint32_t() const { return code; }
 #pragma endregion
 
 #pragma region SStringIterator
-#if (__cplusplus < 201703L)
+#if (__cplusplus < 201703L && _HAS_CXX17 == 0)
 
 SStringIterator::SStringIterator(const char *ref, size_t size, size_t pos) {
     _ref = ref;
@@ -508,7 +508,7 @@ int32_t SStringView::find(const char *str) const {
     return count;
 }
 
-#if (__cplusplus < 201703L)
+#if (__cplusplus < 201703L && _HAS_CXX17 == 0)
 
 SStringView::IteratorType SStringView::iterator() {
     return {_data, _size};
