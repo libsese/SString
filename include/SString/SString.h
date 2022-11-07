@@ -70,6 +70,7 @@ namespace sstr {
     /// \return Unicode 字符
     extern API SChar getUnicodeCharFromUTF8Char(char size, const char *ch);
 
+#if (__cplusplus < 201703L)
     class API SStringIterator final : public std::iterator<std::forward_iterator_tag,
                                                        SChar,
                                                        SChar,
@@ -96,6 +97,7 @@ namespace sstr {
         size_t _size = 0;
         SChar _ch = SChar(0);
     };
+#endif
 
     class API SString;
 
@@ -105,11 +107,13 @@ namespace sstr {
         explicit SStringView(const char *u8str) noexcept;
         virtual ~SStringView() = default;
 
+#if (__cplusplus < 201703L)
     public:
         using IteratorType = SStringIterator;
         IteratorType iterator();
         IteratorType begin();
         IteratorType end();
+#endif
 
     public:
         /// data 是否为 nullptr

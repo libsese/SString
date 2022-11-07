@@ -10,8 +10,11 @@
 
 using sstr::SChar;
 using sstr::SString;
-using sstr::SStringIterator;
 using sstr::SStringView;
+
+#if (__cplusplus < 201703L)
+using sstr::SStringIterator;
+#endif
 
 static SChar NullChar(0);
 
@@ -176,6 +179,7 @@ sstr::SChar::operator uint32_t() const { return code; }
 #pragma endregion
 
 #pragma region SStringIterator
+#if (__cplusplus < 201703L)
 
 SStringIterator::SStringIterator(const char *ref, size_t size, size_t pos) {
     _ref = ref;
@@ -231,6 +235,7 @@ SStringIterator SStringIterator::end() {
     return end;
 }
 
+#endif
 #pragma endregion
 
 #pragma region SString
@@ -503,6 +508,8 @@ int32_t SStringView::find(const char *str) const {
     return count;
 }
 
+#if (__cplusplus < 201703L)
+
 SStringView::IteratorType SStringView::iterator() {
     return {_data, _size};
 }
@@ -514,6 +521,8 @@ SStringView::IteratorType SStringView::begin() {
 SString::IteratorType SStringView::end() {
     return {_data, _size, _size};
 }
+
+#endif
 
 SString SStringView::trim() const {
     auto newSize = _size;
