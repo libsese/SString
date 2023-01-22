@@ -5,12 +5,22 @@ project(SString VERSION 0.1.3)
 set(CMAKE_CXX_STANDARD 11)
 
 add_library(SString SHARED)
-target_include_directories(SString PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(
+        SString
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
 target_sources(SString PRIVATE
         src/algorithm.cpp src/SString.cpp src/SStringBuilder.cpp
         )
 add_library(SString-static)
-target_include_directories(SString-static PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(
+        SString-static
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
 target_sources(SString-static PRIVATE $<TARGET_OBJECTS:SString>)
 
 if (WIN32)
@@ -46,3 +56,36 @@ if (SSTRING_BUILD_TEST)
         target_compile_options(TestSStringBuilder PRIVATE /utf-8)
     endif ()
 endif ()
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+        ${PROJECT_SOURCE_DIR}/cmake/SStringConfig.cmake.in
+        ${PROJECT_BINARY_DIR}/SStringConfig.cmake
+        INSTALL_DESTINATION lib/cmake/SString
+)
+
+install(
+        TARGETS SString SString-static
+        EXPORT SStringTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        PUBLIC_HEADER DESTINATION include
+)
+
+install(
+        DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/include/SString"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+
+install(
+        FILES ${PROJECT_BINARY_DIR}/SStringConfig.cmake
+        DESTINATION lib/cmake/SString
+)
+
+install(
+        EXPORT SStringTargets
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SString
+        NAMESPACE SString::
+)
