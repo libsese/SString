@@ -1,4 +1,5 @@
 #include <SString/SString.h>
+#include <gtest/gtest.h>
 #include <cstdio>
 #include <iostream>
 
@@ -6,13 +7,13 @@ using sstr::SChar;
 using sstr::SString;
 using sstr::SStringView;
 
-void testV1_0() {
+TEST(TestSString, V1_0) {
     const char *str = "你好 こんにちは Hello";
     auto string = SString::fromUTF8(str);
     printf("string.data = %s\n", string.data());
-    printf("string.len = %lu\n", string.len());
-    printf("string.cap = %lu\n", string.cap());
-    printf("string.size = %lu\n", string.size());
+    printf("string.len = %d\n", (int) string.len());
+    printf("string.cap = %d\n", (int) string.cap());
+    printf("string.size = %d\n", (int) string.size());
     printf("string.empty = %s\n", string.empty() ? "true" : "false");
     puts("");
 
@@ -68,7 +69,7 @@ void testV1_0() {
     SStringView spiltString = SStringView("こんにちは、わたくしはSStringです");
     printf("spilt string: %s\n", spiltString.data());
     auto spiltRes = spiltString.split("は");
-    for (const auto &i: spiltRes) {
+    for (auto i: spiltRes) {
         printf("%s\n", i.data());
     }
     puts("");
@@ -90,7 +91,7 @@ void testV1_0() {
     printf("sub2 = %s\n", sub2.data());
 }
 
-void testV1_1() {
+TEST(TestSString, V1_1) {
     auto str = SStringView();
     printf("str.null = %s\n", str.null() ? "true" : "false");
 
@@ -110,10 +111,4 @@ void testV1_1() {
     printf("lower.toUpper = %s\n", lower.data());
     upper.toLower();
     printf("upper.toLower = %s\n", upper.data());
-}
-
-int main() {
-    // testV1_0();
-    testV1_1();
-    return 0;
 }

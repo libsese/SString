@@ -1,29 +1,25 @@
 #include <SString/algorithm.h>
-#include <cstdio>
+#include <gtest/gtest.h>
 
-#define Test(str, sub, func) printf("func: " #func " & index: %d\n", func(str, sub))
+const char *str = "Hello 你好 こんにちは";
+const char *sub0 = "你好";
+const char *sub1 = "He";
+const char *sub2 = "にちは";
 
-int main() {
-    const char *str = "Hello 你好 こんにちは";
-    const char *sub0 = "你好";
-    const char *sub1 = "He";
-    const char *sub2 = "にちは";
-
-    Test(str, sub0, sstr::NORMAL);
-    Test(str, sub0, sstr::KMP);
-    Test(str, sub0, sstr::BM);
-    puts("");
-
-    Test(str, sub1, sstr::NORMAL);
-    Test(str, sub1, sstr::KMP);
-    Test(str, sub1, sstr::BM);
-    puts("");
-
-    Test(str, sub2, sstr::NORMAL);
-    Test(str, sub2, sstr::KMP);
-    Test(str, sub2, sstr::BM);
-
-    return 0;
+TEST(TestAlgol, Normal) {
+    EXPECT_TRUE(sstr::NORMAL(str, sub0) == 6);
+    EXPECT_TRUE(sstr::NORMAL(str, sub1) == 0);
+    EXPECT_TRUE(sstr::NORMAL(str, sub2) == 19);
 }
 
-#undef Test
+TEST(TestAlgol, BM) {
+    EXPECT_TRUE(sstr::BM(str, sub0) == 6);
+    EXPECT_TRUE(sstr::BM(str, sub1) == 0);
+    EXPECT_TRUE(sstr::BM(str, sub2) == 19);
+}
+
+TEST(TestAlgol, KMP) {
+    EXPECT_TRUE(sstr::KMP(str, sub0) == 6);
+    EXPECT_TRUE(sstr::KMP(str, sub1) == 0);
+    EXPECT_TRUE(sstr::KMP(str, sub2) == 19);
+}

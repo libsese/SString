@@ -1,11 +1,12 @@
 #include <SString/SStringBuilder.h>
+#include <gtest/gtest.h>
 
 using sstr::SChar;
 using sstr::SString;
 using sstr::SStringView;
 using sstr::SStringBuilder;
 
-int main() {
+TEST(TestSStrinBuilder, _0) {
     SStringBuilder builder(1024);
     printf("builder.null = %s\n", builder.null() ? "true" : "false");
 
@@ -66,6 +67,4 @@ int main() {
     builder.insert(8, SString::fromUTF8("ing"));
     printf("after insert = %s\n", builder.toString().data());
     builder.clear();
-
-    return 0;
 }
