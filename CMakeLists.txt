@@ -14,7 +14,7 @@ target_include_directories(
 target_sources(SString PRIVATE
         src/algorithm.cpp src/SString.cpp src/SStringBuilder.cpp
         )
-add_library(SString-static)
+add_library(SString-static STATIC)
 target_include_directories(
         SString-static
         PUBLIC
@@ -29,7 +29,7 @@ if (WIN32)
     set_target_properties(SString PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif ()
 
-option(SSTRING_BUILD_TEST "build the unit test for uuid lib" OFF)
+option(SSTRING_BUILD_TEST "build the unit test for sstring lib" OFF)
 
 if (SSTRING_BUILD_TEST)
     find_package(GTest CONFIG REQUIRED)
