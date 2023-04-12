@@ -1,9 +1,16 @@
 {
-  "name" : "sstring",
-  "version-string" : "0.1.3",
-  "description" : "Cross-platform UTF-8 string library.",
-  "dependencies" : [ {
-    "name" : "gtest",
-    "version>=" : "1.12.1"
-  } ]
+  "name": "sstring",
+  "version-string": "0.1.5",
+  "description": "Cross-platform UTF-8 string library.",
+  "features": {
+    "tests": {
+      "description": "build the unit test",
+      "dependencies": [
+        {
+          "name": "gtest",
+          "version>=": "1.12.1"
+        }
+      ]
+    }
+  }
 }
