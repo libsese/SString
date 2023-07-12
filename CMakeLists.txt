@@ -1,5 +1,19 @@
 cmake_minimum_required(VERSION 3.14)
 
+option(SSTRING_BUILD_TEST "build the unit test for sstring lib" OFF)
+if (SSTRING_BUILD_TEST)
+    if (NOT DEFINED VCPKG_MANIFEST_FEATURES)
+        message(STATUS "Auto append features: tests")
+        set(VCPKG_MANIFEST_FEATURES "tests")
+    else ()
+        list(FIND VCPKG_MANIFEST_FEATURES "tests" index)
+        if (index EQUAL -1)
+            message(STATUS "Auto append features: tests")
+            list(APPEND VCPKG_MANIFEST_FEATURES "tests")
+        endif ()
+    endif ()
+endif ()
+
 project(SString VERSION 0.1.5)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -28,8 +42,6 @@ if (WIN32)
     target_compile_options(SString-static PRIVATE "/utf-8")
     set_target_properties(SString PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif ()
-
-option(SSTRING_BUILD_TEST "build the unit test for sstring lib" OFF)
 
 if (SSTRING_BUILD_TEST)
     find_package(GTest CONFIG REQUIRED)
