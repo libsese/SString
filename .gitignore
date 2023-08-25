@@ -5,3 +5,5 @@
 /.vscode/
 /.vs/
 /.xmake/
+/.clwb
+/bazel-*
