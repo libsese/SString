@@ -7,6 +7,9 @@ cc_test(
         "@platforms//os:windows": [
             "/utf-8",
         ],
+	    "//conditions:default": [
+            "-std=c++17"
+        ],
     }),
     deps = [
         "@com_google_googletest//:gtest_main",
@@ -23,6 +26,9 @@ cc_test(
         "@platforms//os:windows": [
             "/utf-8",
         ],
+	    "//conditions:default": [
+            "-std=c++17"
+        ],
     }),
     deps = [
         "@com_google_googletest//:gtest_main",
@@ -35,9 +41,14 @@ cc_test(
     srcs = [
         "TestSStringBuilder.cpp",
     ],
-    copts = [
-        "/utf-8",
-    ],
+    copts = select({
+        "//conditions:default": [
+            "-std=c++17"
+        ],
+	    "@platforms//os:windows": [
+            "/utf-8"
+	    ]
+    }),
     deps = [
         "@com_google_googletest//:gtest_main",
         "@com_sese_sstring//:sstring",
