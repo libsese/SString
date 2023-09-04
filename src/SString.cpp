@@ -2,7 +2,7 @@
 #include <SString/algorithm.h>
 #include <cstring>
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #pragma warning(disable : 4267)
 #endif
 

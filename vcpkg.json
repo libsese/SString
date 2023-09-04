@@ -1,6 +1,6 @@
 {
   "name": "sstring",
-  "version-string": "0.1.5",
+  "version-string": "0.1.6",
   "description": "Cross-platform UTF-8 string library.",
   "features": {
     "tests": {
@@ -8,7 +8,7 @@
       "dependencies": [
         {
           "name": "gtest",
-          "version>=": "1.12.1"
+          "version>=": "1.13.0"
         }
       ]
     }
